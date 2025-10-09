@@ -1,0 +1,22 @@
+repos:
+  - repo: https://github.com/psf/black
+    rev: 23.9.1
+    hooks:
+      - id: black
+
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/PyCQA/pylint
+    rev: v2.17.7
+    hooks:
+      - id: pylint
+        args: [--rcfile=.pylintrc]
+
+  - repo: https://github.com/pytest-dev/pytest
+    rev: 7.4.2
+    hooks:
+      - id: pytest
+        additional_dependencies: [pytest-cov]
