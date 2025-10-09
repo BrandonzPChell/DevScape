@@ -238,32 +238,36 @@ def render_dashboard_content(game_instance) -> str:
     Return a string snapshot of the dashboard for the current game state.
     This function is pure: it does not block, print, or wait for input.
     """
-    lines = []
-
-    # Header
-    lines.append("=== DevScape Dashboard ===")
+    lines = ["=== DevScape Dashboard ==="]
 
     # Player info
     if hasattr(game_instance, "player"):
         lines.append(f"Player: {game_instance.player.name} at ({game_instance.player.x}, {game_instance.player.y})")
 
-    # LLM Character info
-    if hasattr(game_instance, "llm_character"):
-        mood = getattr(game_instance.llm_character, "mood", "unknown")
-        traits = getattr(game_instance.llm_character, "traits", {})
+    llm_char = getattr(game_instance, "llm_character", None)
+    if llm_char:
+        mood = getattr(llm_char, "mood", "unknown")
         lines.append(f"Mood: {mood}")
+
+        traits = getattr(llm_char, "traits", {})
         if traits:
             trait_str = ", ".join(f"{k}: {v}" for k, v in traits.items())
             lines.append(f"Traits: {trait_str}")
+    else:
+        # Graceful fallback when no companion is present
+        lines.append("No companion present.")
 
-    # Timeline summary
+    # Timeline log
     if getattr(game_instance, "timeline_log", []):
-        lines.append(f"Timeline entries: {len(game_instance.timeline_log)}")
+        lines.append("Timeline:")
+        for entry in game_instance.timeline_log:
+            lines.append(f"- {entry}")
 
-    # Event summary
+    # Event log
     if getattr(game_instance, "event_log", []):
-        last_event = game_instance.event_log[-1]
-        lines.append(f"Last event: {last_event.get('event', 'unknown')}")
+        lines.append("Events:")
+        for entry in game_instance.event_log:
+            lines.append(f"- {entry}")
 
     # Footer
     lines.append("==========================")

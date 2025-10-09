@@ -24,14 +24,5 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r game/requirements.txt
 
-      - name: Check formatting with black
-        run: black --check .
-
-      - name: Check import order with isort
-        run: isort --check-only .
-
-      - name: Lint with pylint
-        run: pylint game
-
-      - name: Run tests
-        run: pytest
+      - name: Run Guardians (format, lint, test, coverage)
+        run: make guardians

@@ -1,0 +1,39 @@
+........F.                                                               [100%]
+================================== FAILURES ===================================
+_______________________ test_overall_coverage_threshold _______________________
+
+    def test_overall_coverage_threshold():
+        """
+        Ensure overall coverage meets minimum threshold.
+        Requires pytest to be run with --cov and --cov-report=term-missing.
+        """
+        coverage_file = os.path.join(os.path.dirname(__file__), "..", ".coverage_summary")
+        if not os.path.exists(coverage_file):
+            pytest.skip("Coverage summary file not found. Run pytest with coverage to generate it.")
+    
+        with open(coverage_file, encoding="utf-8") as f:
+            summary = f.read()
+    
+        # Expect at least 85% overall coverage
+>       assert "85%" in summary or "86%" in summary or "87%" in summary or "88%" in summary or "89%" in summary or "90%" in summary, \
+            f"Overall coverage below threshold:\n{summary}"
+E       AssertionError: Overall coverage below threshold:
+E         ........
+E       assert ('85%' in '........' or '86%' in '........' or '87%' in '........' or '88%' in '........' or '89%' in '........' or '90%' in '........')
+
+game\test_game.py:135: AssertionError
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.8-final-0 _______________
+
+Name                Stmts   Miss  Cover   Missing
+-------------------------------------------------
+game\__init__.py        0      0   100%
+game\main.py          380    267    30%   110, 114-123, 135-150, 164-168, 184-230, 297-300, 306-333, 339-340, 344-357, 361-397, 401-497, 501-569, 573-578, 582, 589-595, 602-609, 616-621, 628-633, 641-656, 663-667, 674-707, 747-748, 777-792, 799-809, 816-826, 831-832, 836
+game\ollama_ai.py     110     92    16%   20-68, 71-79, 118-131, 143-209, 216-224, 236, 246
+game\test_game.py      94     15    84%   23-26, 39, 65, 76, 129, 145, 153-158
+-------------------------------------------------
+TOTAL                 584    374    36%
+Coverage HTML written to dir htmlcov
+=========================== short test summary info ===========================
+FAILED game/test_game.py::test_overall_coverage_threshold - AssertionError: O...
+1 failed, 9 passed in 1.08s

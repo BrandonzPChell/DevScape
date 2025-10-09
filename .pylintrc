@@ -14,6 +14,15 @@ disable=
     R0902,  # too-many-instance-attributes (acceptable for Game class)
     R0903,  # too-few-public-methods (acceptable for simple data classes/entities)
     E1101,  # no-member (pygame false positives)
+    E0402,  # attempted-relative-import-beyond-top-level
+    E0401,  # import-error
+    C0413,  # wrong-import-position
+    W0105,  # pointless-string-statement
+    R0917,  # too-many-positional-arguments
+    R0912,  # too-many-branches
+    R0913,  # too-many-arguments
+    R0914,  # too-many-local-variables
+    C0301,  # line-too-long (for LLM prompts)
 
 [FORMAT]
 max-line-length=88

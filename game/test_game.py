@@ -1,7 +1,7 @@
 """Test suite for the game module."""
 import io
 import json
-from unittest.mock import patch, mock_open
+from unittest.mock import patch, mock_open, MagicMock, ANY
 import pytest
 from game.main import Game, render_pixel_art, render_dashboard_content
 import pygame
@@ -13,7 +13,8 @@ import pygame
 @pytest.fixture
 def game_instance():
     """Fixture to create a Game instance with pygame dependencies mocked."""
-    with patch('pygame.init'), patch('pygame.font.init'), patch('pygame.font.Font'):
+    with patch('pygame.init'), patch('pygame.font.init'), patch('pygame.font.Font'), \
+         patch('pygame.display.set_mode', return_value=MagicMock(spec=pygame.Surface)):
         game = Game()
         yield game
 
@@ -241,8 +242,9 @@ def test_render_dashboard_content_includes_last_event(game_instance):
 
     output = render_dashboard_content(game_instance)
 
-    # Assert the last event is reported
-    assert "Last event: eclipse" in output
+    # Assert both events are reported in the new format
+    assert "- {'timestamp': 10, 'event': 'festival', 'mood': 'joyful', 'traits': {}}" in output
+    assert "- {'timestamp': 20, 'event': 'eclipse', 'mood': 'calm', 'traits': {}}" in output
 
 # -------------------------------------------------------------------
 # Phase 22a: Milestone 3 Guardians (Dashboard – Timeline Entries)
@@ -259,8 +261,10 @@ def test_render_dashboard_content_includes_timeline(game_instance):
 
     output = render_dashboard_content(game_instance)
 
-    # Assert the summary line is present
-    assert "Timeline entries: 3" in output
+    # Assert all timeline entries are reported in the new format
+    assert "- {'timestamp': 1, 'mood': 'calm', 'traits': {}}" in output
+    assert "- {'timestamp': 2, 'mood': 'joyful', 'traits': {}}" in output
+    assert "- {'timestamp': 3, 'mood': 'focused', 'traits': {}}" in output
 
 # -------------------------------------------------------------------
 # Phase 21b: Milestone 2 Guardians (Render Pixel Art – Empty Glyph)
@@ -413,15 +417,183 @@ def test_export_data_handles_missing_llm_character(game_instance, monkeypatch):
 
 
 # -------------------------------------------------------------------
-# Phase 25: Quick-Win Coverage Checklist
+# Phase 24d: Dashboard Guardians (Multi‑Trait Rendering)
 # -------------------------------------------------------------------
 
-# 1. Entity Movement Edge Case
+def test_render_dashboard_content_includes_multiple_traits(game_instance):
+    """Ensure dashboard content lists multiple traits clearly."""
+    game_instance.llm_character.traits = {"courage": 5, "wisdom": 7, "kindness": 2}
+
+    output = render_dashboard_content(game_instance)
+
+    # Each trait should appear in the output
+    assert "courage: 5" in output
+    assert "wisdom: 7" in output
+    assert "kindness: 2" in output
+
+# -------------------------------------------------------------------
+# Phase 24e: Dashboard Guardians (Unusual Mood Value)
+# -------------------------------------------------------------------
+
+def test_render_dashboard_content_handles_unusual_mood(game_instance):
+    """Ensure dashboard content displays unusual mood values without error."""
+    game_instance.llm_character.mood = "??? ecstatic-overdrive ??-"
+
+    output = render_dashboard_content(game_instance)
+
+    # The unusual mood string should be preserved in the output
+    assert "??? ecstatic-overdrive ??-" in output
+
+
+# -------------------------------------------------------------------
+# Phase 24f: Dashboard Guardians (Empty Traits)
+# -------------------------------------------------------------------
+
+def test_render_dashboard_content_handles_empty_traits(game_instance):
+    """Ensure dashboard content omits 'Traits:' line when traits dict is empty."""
+    game_instance.llm_character.traits = {}
+
+    output = render_dashboard_content(game_instance)
+
+    assert "Traits:" not in output
+
+# -------------------------------------------------------------------
+# Phase 24g: Dashboard Guardians (Missing llm_character)
+# -------------------------------------------------------------------
+
+def test_render_dashboard_content_handles_missing_llm_character(game_instance, monkeypatch):
+    """Ensure dashboard content renders gracefully if llm_character is None."""
+    monkeypatch.setattr(game_instance, "llm_character", None)
+
+    output = render_dashboard_content(game_instance)
+
+    # Should still render the dashboard header/footer without crashing
+    assert "DevScape Dashboard" in output
+    assert "Traits:" not in output
+    assert "Mood:" not in output
+
+# -------------------------------------------------------------------
+# Phase 24h: Dashboard Guardians (Mixed Logs)
+# -------------------------------------------------------------------
+
+def test_render_dashboard_content_with_mixed_logs(game_instance):
+    """Ensure dashboard content includes both timeline and event log entries."""
+    game_instance.timeline_log = [{"entry": "Traveler entered the shrine"}, {"entry": "Traveler lit the beacon"}]
+    game_instance.event_log = [{"event": "Festival of Coverage ascended"}, {"event": "Guardian invoked"}]
+
+    output = render_dashboard_content(game_instance)
+
+    # Timeline entries should appear
+    assert "- {'entry': 'Traveler entered the shrine'}" in output
+    assert "- {'entry': 'Traveler lit the beacon'}" in output
+
+    # Event log entries should appear
+    assert "- {'event': 'Festival of Coverage ascended'}" in output
+    assert "- {'event': 'Guardian invoked'}" in output
+
+
+# 7. Test draw_chat_bubble function
+@patch('game.main.pygame.time.get_ticks', return_value=1000)
+@patch('game.main.pygame.draw.rect')
+def test_draw_chat_bubble(mock_draw_rect, mock_get_ticks):
+    from game.main import draw_chat_bubble, SCREEN_WIDTH
+    mock_surface = MagicMock()
+    mock_font = MagicMock()
+    mock_font.size.return_value = (50, 20) # Mock font.size for word wrapping
+    mock_font.render.return_value = MagicMock(get_width=lambda: 50, get_height=lambda: 20)
+
+    # Test with text
+    draw_chat_bubble(mock_surface, "Hello World", (100, 100), mock_font)
+    mock_draw_rect.assert_called() # Should be called for bubble background and border
+    mock_surface.blit.assert_called() # Should be called for text
+
+    mock_draw_rect.reset_mock()
+    mock_surface.blit.reset_mock()
+
+    # Test with empty text
+    draw_chat_bubble(mock_surface, "", (100, 100), mock_font)
+    mock_draw_rect.assert_not_called()
+    mock_surface.blit.assert_not_called()
+
+    mock_draw_rect.reset_mock()
+    mock_surface.blit.reset_mock()
+
+    # Test with expired bubble
+    draw_chat_bubble(mock_surface, "Expired", (100, 100), mock_font, bubble_expires_time=500)
+    mock_draw_rect.assert_not_called()
+    mock_surface.blit.assert_not_called()
+
+# 6. Test Game.export_lineage_badge
+def test_export_lineage_badge(game_instance):
+    # Test with empty timeline_log
+    game_instance.timeline_log = []
+    badge_json = json.loads(game_instance.export_lineage_badge())
+    assert badge_json["entries"] == 0
+    assert badge_json["color"] == "lightgrey"
+
+    # Test with non-empty timeline_log
+    game_instance.timeline_log = [{"entry": "event1"}, {"entry": "event2"}]
+    badge_json = json.loads(game_instance.export_lineage_badge())
+    assert badge_json["entries"] == 2
+    assert badge_json["color"] == "blue"
+
+# 5. Test Game.export_covenant_badge
+def test_export_covenant_badge(game_instance):
+    # Test passing
+    badge_json = json.loads(game_instance.export_covenant_badge(True, True))
+    assert badge_json["status"] == "passing"
+    assert badge_json["color"] == "brightgreen"
+
+    # Test failing (contributing_ok False)
+    badge_json = json.loads(game_instance.export_covenant_badge(False, True))
+    assert badge_json["status"] == "failing"
+    assert badge_json["color"] == "red"
+
+    # Test failing (conduct_ok False)
+    badge_json = json.loads(game_instance.export_covenant_badge(True, False))
+    assert badge_json["status"] == "failing"
+    assert badge_json["color"] == "red"
+
+    # Test failing (both False)
+    badge_json = json.loads(game_instance.export_covenant_badge(False, False))
+    assert badge_json["status"] == "failing"
+    assert badge_json["color"] == "red"
+
+# 4. Test Game.export_coverage_badge
+def test_export_coverage_badge(game_instance):
+    # Test brightgreen
+    badge_json = json.loads(game_instance.export_coverage_badge(85))
+    assert badge_json["color"] == "brightgreen"
+    assert "85%" in badge_json["markdown"]
+
+    # Test yellow
+    badge_json = json.loads(game_instance.export_coverage_badge(70))
+    assert badge_json["color"] == "yellow"
+    assert "70%" in badge_json["markdown"]
+
+    # Test orange
+    badge_json = json.loads(game_instance.export_coverage_badge(50))
+    assert badge_json["color"] == "orange"
+    assert "50%" in badge_json["markdown"]
+
+    # Test red
+    badge_json = json.loads(game_instance.export_coverage_badge(49))
+    assert badge_json["color"] == "red"
+    assert "49%" in badge_json["markdown"]
+
+# 1. Entity Movement Edge Case# 1. Entity Movement Edge Case
 def test_entity_move_no_op():
     from game.main import Entity
     e = Entity("Still", x=5, y=5, art=["X"])
     e.move(0, 0, []) # Pass an empty map for simplicity, as movement is constrained by map
     assert (e.x, e.y) == (5, 5)
+
+def test_entity_move_diagonal_prevention():
+    from game.main import Entity, GAME_MAP
+    entity = Entity("Test", x=10, y=10, art=["X"])
+    initial_pos = (entity.x, entity.y)
+    entity.move(1, 1, GAME_MAP) # Attempt diagonal move
+    assert (entity.x, entity.y) == initial_pos # Should not move
 
 # 2. Export Timeline Empty Case
 def test_export_timeline_empty(game_instance):
@@ -466,6 +638,6 @@ def test_coverage_threshold(cov_percent):
     Festival of Coverage Guardian:
     Ensure minimum coverage is upheld at the current milestone.
     """
-    assert cov_percent >= 60, (
+    assert cov_percent >= 70, (
         f"Coverage {cov_percent}% is below the Festival threshold of 60%"
     )

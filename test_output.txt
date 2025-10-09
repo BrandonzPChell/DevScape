@@ -1,0 +1,7 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.8, pytest-8.4.2, pluggy-1.6.0
+rootdir: C:\Users\BigTe\OneDrive\Desktop\DevScape
+plugins: cov-7.0.0
+collected 1 item
+
+game\test_game.py 
