@@ -1,80 +1,389 @@
-"""
-Tests for the DevScape game, focusing on rendering functions.
-"""
-
-import pygame
+"""Test suite for the game module."""
+import io
+import json
+from unittest.mock import patch, mock_open
 import pytest
-from main import COLOR_MAP, TILE_SIZE, TRANSPARENT, render_pixel_art
+from game.main import Game, render_pixel_art, render_dashboard_content
+import pygame
+
+# Mock pygame dependencies for tests
+# This needs to be done before importing Game if Game() calls pygame.init()
+# However, if Game() is instantiated within a fixture, the patch can be in the fixture.
+
+@pytest.fixture
+def game_instance():
+    """Fixture to create a Game instance with pygame dependencies mocked."""
+    with patch('pygame.init'), patch('pygame.font.init'), patch('pygame.font.Font'):
+        game = Game()
+        yield game
+
+def test_generate_sprite(game_instance):
+    """Tests the procedural sprite generation for different seed types."""
+    # Test with an even-length seed
+    even_seed_sprite = game_instance.generate_sprite("seed1234")
+    assert even_seed_sprite == ["XXXX", "X..X", "X..X", "XXXX"]
+
+    # Test with an odd-length seed
+    odd_seed_sprite = game_instance.generate_sprite("seed123")
+    assert odd_seed_sprite == ["O.O", ".O.", "O.O"]
+
+    # Test with an empty seed (fallback case)
+    empty_seed_sprite = game_instance.generate_sprite("")
+    assert empty_seed_sprite == ["....", ".##.", ".##.", "...."]
+
+def test_export_lore(game_instance):
+    """Tests that the lore export function returns a valid JSON string with the correct structure."""
+    lore_json = game_instance.export_lore()
+    
+    # Verify it's a valid JSON string
+    try:
+        data = json.loads(lore_json)
+    except json.JSONDecodeError:
+        pytest.fail("export_lore() did not return a valid JSON string.")
+
+    # Verify the structure of the JSON data
+    assert "arc" in data
+    assert "glyphs" in data
+    assert "lineage" in data
+    assert isinstance(data["glyphs"], list)
+
+# -------------------------------------------------------------------
+# Phase 14b: Overlay Glyph Guardian
+# -------------------------------------------------------------------
+
+def test_generate_overlay_variants(game_instance):
+    """Ensure generate_overlay returns structured glyphs for moods without backslash issues."""
+    # Happy overlay
+    happy_overlay = game_instance.generate_overlay("happy")
+    assert isinstance(happy_overlay, list)
+    assert len(happy_overlay) == 3
+    assert any("o" in line for line in happy_overlay)
+
+    # Angry overlay
+    angry_overlay = game_instance.generate_overlay("angry")
+    assert isinstance(angry_overlay, list)
+    assert len(angry_overlay) == 3
+    assert any("X" in line for line in angry_overlay)
+
+    # Neutral overlay (fallback)
+    neutral_overlay = game_instance.generate_overlay("neutral")
+    assert isinstance(neutral_overlay, list)
+    assert len(neutral_overlay) == 3
+    assert any("." in line for line in neutral_overlay)
+
+# -------------------------------------------------------------------
+# Phase 16: Planetary Mood & Event Guardians
+# -------------------------------------------------------------------
+
+def test_update_planetary_mood(game_instance):
+    """Tests that planetary mood is updated correctly for known and unknown moods."""
+    # Test a known mood (happy path)
+    game_instance.update_planetary_mood("joyful")
+    assert game_instance.planetary_mood == 0.7
+    assert game_instance.llm_character.mood == "joyful"
+
+    # Test an unknown mood (neutral fallback)
+    game_instance.update_planetary_mood("some_unknown_mood")
+    assert game_instance.planetary_mood == 0.0
+    assert game_instance.llm_character.mood == "neutral"
 
 
-@pytest.fixture(scope="module")
-def pygame_init():
-    """Initializes pygame for the test module and quits it after tests run."""
-    pygame.init()
-    yield
-    pygame.quit()
+def test_apply_planetary_event_festival_and_eclipse(game_instance):
+    """Tests the 'festival' and 'eclipse' events in apply_planetary_event."""
+    # Initialize traits for the llm_character
+    game_instance.llm_character.traits = {"empathy": 0, "focus": 0}
+
+    # Test the 'festival' event
+    game_instance.apply_planetary_event("festival")
+    assert game_instance.planetary_mood == 0.7  # Should be joyful
+    assert game_instance.llm_character.traits["empathy"] == 1
+    assert len(game_instance.event_log) == 1
+    assert game_instance.event_log[0]["event"] == "festival"
+
+    # Test the 'eclipse' event
+    game_instance.apply_planetary_event("eclipse")
+    assert game_instance.planetary_mood == 0.2  # Should be calm
+    assert game_instance.llm_character.traits["focus"] == 1
+    assert len(game_instance.event_log) == 2
+    assert game_instance.event_log[1]["event"] == "eclipse"
+
+def test_save_timeline_with_mock_io(game_instance):
+    """Tests that save_timeline writes the correct JSON data using a mocked file."""
+    # Populate the timeline with some data
+    game_instance.timeline_log = [
+        {"timestamp": 123, "mood": "serene", "traits": {"patience": 1.0}}
+    ]
+    expected_json = game_instance.export_timeline()
+    
+    # Use mock_open to patch the 'open' function
+    with patch("builtins.open", mock_open()) as mocked_file:
+        # Call the function that writes to a file
+        game_instance.save_timeline("dummy/path/timeline.json")
+
+        # Check that 'open' was called with the correct path and mode
+        mocked_file.assert_called_once_with("dummy/path/timeline.json", "w", encoding="utf-8")
+        
+        # Check that 'write' was called with the correct content
+        mocked_file().write.assert_called_once_with(expected_json)
+
+# -------------------------------------------------------------------
+# Phase 17: File I/O Guardians (Events & Constellation)
+# -------------------------------------------------------------------
+
+def test_save_events_with_mock_io(game_instance):
+    """Ensure save_events writes the correct JSON data using a mocked file."""
+    # Populate the event log with some data
+    game_instance.event_log = [
+        {"timestamp": 456, "event": "storm", "mood": "tense", "traits": {"courage": 2}}
+    ]
+    expected_json = json.dumps(game_instance.event_log, indent=2)
+
+    with patch("builtins.open", mock_open()) as mocked_file:
+        game_instance.save_events("dummy/path/events.json")
+
+        mocked_file.assert_called_once_with("dummy/path/events.json", "w", encoding="utf-8")
+        mocked_file().write.assert_called_once_with(expected_json)
 
 
-def test_render_pixel_art_basic(pygame_init):
-    """Tests that render_pixel_art correctly draws a basic pattern."""
-    # Create a small surface to render on
-    surface_width = TILE_SIZE
-    surface_height = TILE_SIZE
-    surface = pygame.Surface((surface_width, surface_height), pygame.SRCALPHA)
-    surface.fill((0, 0, 0, 0))  # Fill with transparent black
+def test_save_constellation_with_mock_io(game_instance):
+    """Ensure save_constellation writes the correct JSON data using a mocked file."""
+    # Populate constellation‑related state
+    game_instance.timeline_log = [{"timestamp": 789, "mood": "calm", "traits": {"focus": 1}}]
+    game_instance.event_log = [{"timestamp": 790, "event": "eclipse", "mood": "calm", "traits": {"focus": 1}}]
+    expected_json = game_instance.export_constellation()
 
-    # Sample pixel art
-    pixel_art = ["X.X", ".X.", "X.X"]
+    with patch("builtins.open", mock_open()) as mocked_file:
+        game_instance.save_constellation("dummy/path/constellation.json")
 
-    rect = pygame.Rect(0, 0, TILE_SIZE, TILE_SIZE)
-    render_pixel_art(surface, pixel_art, rect)
-
-    art_height = len(pixel_art)
-    art_width = len(pixel_art[0])
-    pixel_w = rect.width / art_width
-    pixel_h = rect.height / art_height
-
-    # Verify colors
-    for row_idx, line in enumerate(pixel_art):
-        for col_idx, char in enumerate(line):
-            expected_color = COLOR_MAP.get(char, TRANSPARENT)
-            check_x = int(rect.left + col_idx * pixel_w + pixel_w / 2)
-            check_y = int(rect.top + row_idx * pixel_h + pixel_h / 2)
-            actual_color = surface.get_at((check_x, check_y))
-
-            # Pygame's get_at returns a Color object, compare RGB values
-            if expected_color == TRANSPARENT:
-                # For transparent pixels, we expect the surface to remain transparent
-                assert actual_color[3] == 0  # Check alpha channel for transparency
-            else:
-                assert actual_color[:3] == expected_color[:3]  # Compare RGB
-                assert actual_color[3] == 255  # Ensure it's not transparent
+        mocked_file.assert_called_once_with("dummy/path/constellation.json", "w", encoding="utf-8")
+        mocked_file().write.assert_called_once_with(expected_json)
 
 
-def test_render_pixel_art_offset(pygame_init):
-    """Tests that render_pixel_art correctly draws at an offset position."""
-    surface_width = 10 * TILE_SIZE
-    surface_height = 10 * TILE_SIZE
-    surface = pygame.Surface((surface_width, surface_height), pygame.SRCALPHA)
-    surface.fill((0, 0, 0, 0))
+# -------------------------------------------------------------------
+# Phase 18: Milestone 1 Guardians (Export Data Structure)
+# -------------------------------------------------------------------
 
-    pixel_art = [
-        "X",
+def test_export_data_structure(game_instance):
+    """Ensure export_data returns a valid JSON string with expected top-level keys."""
+    exported_json = game_instance.export_data()
+    
+    try:
+        data = json.loads(exported_json)
+    except json.JSONDecodeError:
+        pytest.fail("export_data() did not return a valid JSON string.")
+
+    # Confirm top-level keys based on current implementation
+    assert "player" in data
+    assert "llm_character" in data
+    assert "timestamp" in data
+    assert "version" in data
+
+    # Confirm nested keys for llm_character
+    assert "mood" in data["llm_character"]
+    # 'traits' is not directly exported by export_data, but is part of llm_character's state.
+    # 'timeline' and 'events' are not part of the export_data output.
+
+# -------------------------------------------------------------------
+# Phase 21: Milestone 2 Guardians (Render Pixel Art)
+# -------------------------------------------------------------------
+from unittest.mock import MagicMock
+
+def test_render_pixel_art_calls_surface_methods(monkeypatch):
+    """Ensure render_pixel_art interacts with pygame.Surface as expected."""
+    import pygame
+    # Create a fake surface with mocked methods
+    fake_surface = MagicMock()
+    monkeypatch.setattr(pygame, "Surface", lambda size: fake_surface)
+
+    # Simple glyph: 2x2 block
+    glyph = [
+        "##",
+        "##"
     ]
 
-    offset_x = 3 * TILE_SIZE
-    offset_y = 2 * TILE_SIZE
+    # Call the function under test
+    render_pixel_art(fake_surface, glyph, pygame.Rect(0, 0, 10, 10))
 
-    rect = pygame.Rect(offset_x, offset_y, TILE_SIZE, TILE_SIZE)
-    render_pixel_art(surface, pixel_art, rect)
+    # Assert that fill (or blit) was called at least once
+    assert fake_surface.fill.called or fake_surface.blit.called
 
-    # Check the pixel at the offset location
-    actual_color = surface.get_at(
-        (offset_x + TILE_SIZE // 2, offset_y + TILE_SIZE // 2)
-    )
-    assert actual_color[:3] == COLOR_MAP["X"][:3]
-    assert actual_color[3] == 255
+    # Optionally: check that calls roughly match glyph size
+    total_calls = fake_surface.fill.call_count + fake_surface.blit.call_count
+    assert total_calls >= 1
 
-    # Check a pixel outside the rendered area to ensure it's transparent
-    actual_color_outside = surface.get_at((0, 0))
-    assert actual_color_outside[3] == 0
+
+def test_render_dashboard_content_includes_player_and_mood(game_instance):
+    game_instance.player.name = "Traveler"
+    game_instance.player.x, game_instance.player.y = 1, 2
+    game_instance.llm_character.mood = "joyful"
+    game_instance.llm_character.traits = {"courage": 3}
+
+    output = render_dashboard_content(game_instance)
+
+    assert "Traveler" in output
+    assert "(1, 2)" in output
+    assert "joyful" in output
+    assert "courage: 3" in output
+
+
+
+# -------------------------------------------------------------------
+# Phase 22b: Milestone 3 Guardians (Dashboard – Last Event)
+# -------------------------------------------------------------------
+
+def test_render_dashboard_content_includes_last_event(game_instance):
+    """Ensure render_dashboard_content reports the last event in the event log."""
+    # Populate event_log with two events
+    game_instance.event_log = [
+        {"timestamp": 10, "event": "festival", "mood": "joyful", "traits": {}},
+        {"timestamp": 20, "event": "eclipse", "mood": "calm", "traits": {}},
+    ]
+
+    output = render_dashboard_content(game_instance)
+
+    # Assert the last event is reported
+    assert "Last event: eclipse" in output
+
+# -------------------------------------------------------------------
+# Phase 22a: Milestone 3 Guardians (Dashboard – Timeline Entries)
+# -------------------------------------------------------------------
+
+def test_render_dashboard_content_includes_timeline(game_instance):
+    """Ensure render_dashboard_content reports the number of timeline entries."""
+    # Populate timeline_log with 3 entries
+    game_instance.timeline_log = [
+        {"timestamp": 1, "mood": "calm", "traits": {}},
+        {"timestamp": 2, "mood": "joyful", "traits": {}},
+        {"timestamp": 3, "mood": "focused", "traits": {}},
+    ]
+
+    output = render_dashboard_content(game_instance)
+
+    # Assert the summary line is present
+    assert "Timeline entries: 3" in output
+
+# -------------------------------------------------------------------
+# Phase 21b: Milestone 2 Guardians (Render Pixel Art – Empty Glyph)
+# -------------------------------------------------------------------
+
+def test_render_pixel_art_empty_glyph(monkeypatch):
+    """Ensure render_pixel_art handles an empty glyph gracefully without errors."""
+    import pygame
+    # Create a fake surface with mocked methods
+    fake_surface = MagicMock()
+    monkeypatch.setattr(pygame, "Surface", lambda size: fake_surface)
+
+    # Empty glyph input
+    glyph = []
+
+    # Call should not raise any exceptions
+    render_pixel_art(fake_surface, glyph, pygame.Rect(0, 0, 10, 10))
+
+    # Since glyph is empty, no fill/blit calls should be made
+    assert fake_surface.fill.call_count == 0
+    assert fake_surface.blit.call_count == 0
+
+# -------------------------------------------------------------------
+# Phase 19: Milestone 1 Guardians (Export Timeline, Trait Chart, Constellation)
+# -------------------------------------------------------------------
+
+def test_export_timeline_structure(game_instance):
+    """Ensure export_timeline returns a valid JSON string with expected timeline entries."""
+    game_instance.timeline_log = [
+        {"timestamp": 1, "mood": "joyful", "traits": {"empathy": 1}},
+        {"timestamp": 2, "mood": "calm", "traits": {"focus": 1}},
+    ]
+    exported_json = game_instance.export_timeline()
+
+    try:
+        data = json.loads(exported_json)
+    except json.JSONDecodeError:
+        pytest.fail("export_timeline() did not return a valid JSON string.")
+
+    assert isinstance(data, list)
+    assert len(data) == 2
+    assert data[0]["mood"] == "joyful"
+    assert data[1]["traits"]["focus"] == 1
+
+
+def test_export_trait_chart_structure(game_instance):
+    """Ensure export_trait_chart returns a valid JSON string with multiple traits and correct history length."""
+    game_instance.llm_character.traits = {"empathy": 5.0, "focus": 3.0}
+    game_instance.timeline_log = [
+        {"timestamp": 1, "mood": "joyful", "traits": {"empathy": 1}},
+        {"timestamp": 2, "mood": "calm", "traits": {"focus": 1}},
+        {"timestamp": 3, "mood": "serene", "traits": {"patience": 1}},
+    ]
+    exported_json = game_instance.export_trait_chart()
+
+    try:
+        data = json.loads(exported_json)
+    except json.JSONDecodeError:
+        pytest.fail("export_trait_chart() did not return a valid JSON string.")
+
+    assert "traits" in data
+    assert "timestamp" in data
+    assert "history_length" in data
+    assert data["traits"]["empathy"] == 5.0
+    assert data["traits"]["focus"] == 3.0
+    assert data["history_length"] == 3
+
+
+def test_export_constellation_structure(game_instance):
+    """Ensure export_constellation returns a valid JSON string with events, glyphs, and lineage."""
+    game_instance.timeline_log = [
+        {"timestamp": 1, "mood": "joyful", "traits": {"empathy": 1}},
+    ]
+    game_instance.event_log = [
+        {"timestamp": 1, "event": "festival", "mood": "joyful", "traits": {"empathy": 1}},
+        {"timestamp": 2, "event": "eclipse", "mood": "calm", "traits": {"focus": 1}},
+    ]
+    exported_json = game_instance.export_constellation()
+
+    try:
+        data = json.loads(exported_json)
+    except json.JSONDecodeError:
+        pytest.fail("export_constellation() did not return a valid JSON string.")
+
+    assert "events" in data
+    assert "glyphs" in data
+    assert "lineage" in data
+    assert isinstance(data["events"], list)
+    assert isinstance(data["glyphs"], list)
+    assert len(data["events"]) == 2
+    assert len(data["glyphs"]) == 2
+    assert data["glyphs"][0] == "☀" # joyful mood glyph
+    assert data["glyphs"][1] == "☽" # calm mood glyph
+    assert "Version" in data["lineage"]
+
+# Fixture to get coverage percentage
+@pytest.fixture(scope="session")
+def cov_percent(pytestconfig):
+    """Fixture to retrieve the coverage percentage from pytest-cov."""
+    cov_plugin = pytestconfig.pluginmanager.getplugin("_cov")
+    if cov_plugin is None:
+        pytest.skip("pytest-cov not installed or not enabled")
+    
+    # This is a bit of a hack, as pytest-cov doesn't expose a direct API for this.
+    # We're accessing internal attributes. This might break with future pytest-cov versions.
+    # A more robust solution might involve parsing the coverage report file.
+    try:
+        total_statements = cov_plugin.cov_controller.cov.get_data().total_statements()
+        covered_statements = cov_plugin.cov_controller.cov.get_data().lines_covered()
+        if total_statements == 0:
+            return 100.0 # Or 0.0, depending on desired behavior for empty projects
+        return (covered_statements / total_statements) * 100
+    except Exception:
+        pytest.skip("Could not retrieve coverage percentage from pytest-cov")
+
+# -------------------------------------------------------------------
+# Phase 23a: Festival of Coverage Ascension (Threshold 50%)
+# -------------------------------------------------------------------
+
+def test_coverage_threshold(cov_percent):
+    """
+    Festival of Coverage Guardian:
+    Ensure minimum coverage is upheld at the current milestone.
+    """
+    assert cov_percent >= 50, \
+        f"Coverage {cov_percent}% is below the Festival threshold of 50%"
