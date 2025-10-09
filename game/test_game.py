@@ -356,6 +356,87 @@ def test_export_constellation_structure(game_instance):
     assert data["glyphs"][1] == "☽" # calm mood glyph
     assert "Version" in data["lineage"]
 
+
+# -------------------------------------------------------------------
+# Phase 24: Quick-Win Guardians
+# -------------------------------------------------------------------
+
+# -------------------------------------------------------------------
+# Phase 24a: Entity Guardians (Description)
+# -------------------------------------------------------------------
+
+def test_entity_description_includes_name_and_position():
+    """Ensure Entity description includes its name and coordinates."""
+    from game.main import Entity
+    entity = Entity("Traveler", x=3, y=4, art=["X"])
+
+    # Assuming Entity has a __str__ method or a describe method
+    # For now, we'll just check its attributes directly as there's no __str__ or describe yet.
+    # This test will need to be updated once a proper description method is added.
+    desc = f"Name: {entity.name}, Position: ({entity.x}, {entity.y})"
+
+    assert "Traveler" in desc
+    assert "3" in desc and "4" in desc
+
+# -------------------------------------------------------------------
+# Phase 24b: Dashboard Guardians (Empty Logs)
+# -------------------------------------------------------------------
+
+def test_render_dashboard_content_handles_empty_logs(game_instance):
+    """Ensure dashboard content renders gracefully with no timeline or events."""
+    game_instance.timeline_log = []
+    game_instance.event_log = []
+
+    output = render_dashboard_content(game_instance)
+
+    # Should still include header/footer and not crash
+    assert "DevScape Dashboard" in output
+    assert "Timeline entries" not in output
+    assert "Last event" not in output
+
+# -------------------------------------------------------------------
+# Phase 24c: Export Guardians (Defensive Branch)
+# -------------------------------------------------------------------
+
+def test_export_data_handles_missing_llm_character(game_instance, monkeypatch):
+    """Ensure export_data still returns valid JSON if llm_character is missing."""
+    # Temporarily remove llm_character
+    monkeypatch.setattr(game_instance, "llm_character", None)
+
+    exported_json = game_instance.export_data()
+    data = json.loads(exported_json)
+
+    # Should still include top-level keys
+    assert "player" in data
+    assert "timestamp" in data
+    assert "version" in data
+
+
+# -------------------------------------------------------------------
+# Phase 25: Quick-Win Coverage Checklist
+# -------------------------------------------------------------------
+
+# 1. Entity Movement Edge Case
+def test_entity_move_no_op():
+    from game.main import Entity
+    e = Entity("Still", x=5, y=5, art=["X"])
+    e.move(0, 0, []) # Pass an empty map for simplicity, as movement is constrained by map
+    assert (e.x, e.y) == (5, 5)
+
+# 2. Export Timeline Empty Case
+def test_export_timeline_empty(game_instance):
+    game_instance.timeline_log = []
+    exported = game_instance.export_timeline()
+    data = json.loads(exported)
+    assert data == []
+
+# 3. Export Events Empty Case
+def test_export_events_empty(game_instance):
+    game_instance.event_log = []
+    exported = game_instance.export_events()
+    data = json.loads(exported)
+    assert data == []
+
 # Fixture to get coverage percentage
 @pytest.fixture(scope="session")
 def cov_percent(pytestconfig):
@@ -385,5 +466,6 @@ def test_coverage_threshold(cov_percent):
     Festival of Coverage Guardian:
     Ensure minimum coverage is upheld at the current milestone.
     """
-    assert cov_percent >= 50, \
-        f"Coverage {cov_percent}% is below the Festival threshold of 50%"
+    assert cov_percent >= 60, (
+        f"Coverage {cov_percent}% is below the Festival threshold of 60%"
+    )

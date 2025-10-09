@@ -627,9 +627,13 @@ class Game:
         Exports game state data (player, entities, etc.) as a JSON string.
         This is a placeholder for future implementation.
         """
+        llm_char_data = {}
+        if self.llm_character:
+            llm_char_data = {"x": self.llm_character.x, "y": self.llm_character.y, "name": self.llm_character.name, "mood": self.llm_character.mood}
+
         data = {
             "player": {"x": self.player.x, "y": self.player.y, "name": self.player.name},
-            "llm_character": {"x": self.llm_character.x, "y": self.llm_character.y, "name": self.llm_character.name, "mood": self.llm_character.mood},
+            "llm_character": llm_char_data,
             "timestamp": pygame.time.get_ticks(), # Using pygame ticks as a simple timestamp
             "version": __version__
         }
@@ -794,7 +798,14 @@ class Game:
     def save_events(self, filepath: str):
         """Write event_log to disk as JSON."""
         with open(filepath, "w", encoding="utf-8") as f:
-            f.write(json.dumps(self.event_log, indent=2))
+            f.write(self.export_events())
+
+    def export_events(self) -> str:
+        """
+        Export the accumulated event log.
+        Returns a JSON string containing the full event_log.
+        """
+        return json.dumps(self.event_log, indent=2)
 
     def save_constellation(self, filepath: str):
         """Write constellation export to disk as JSON."""
