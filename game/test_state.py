@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import patch
 from game.main import Game, Entity
+import json
 
 @pytest.fixture
 def game_instance():
@@ -71,3 +72,98 @@ def test_apply_planetary_event(game_instance):
     assert game_instance.llm_character.traits["focus"] == 1
     assert len(game_instance.event_log) == 2
     assert game_instance.event_log[1]["event"] == "eclipse"
+
+# -------------------------------------------------------------------
+# Phase 28a: Edge Guardians (Menu Edge Cases)
+# -------------------------------------------------------------------
+
+def test_menu_edge_cases(monkeypatch):
+    """Ensure menu handles empty options and invalid selections gracefully."""
+    from game.main import menu  # adjust if menu lives elsewhere
+
+    # Case 1: Empty options
+    monkeypatch.setattr("builtins.input", lambda _: "0")  # simulate any input
+    result = menu("Choose wisely:", [])
+    # Should return None or safe fallback, not crash
+    assert result is None or result == ""
+
+    # Case 2: Invalid selection (out of range)
+    inputs = iter(["99", "1"])  # first invalid, then valid
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+    result = menu("Pick an option:", ["apple", "banana"])
+    # Should eventually return a valid choice
+    assert result in ["apple", "banana"]
+
+# -------------------------------------------------------------------
+# Phase 28b: Stress Guardians (Sprite Edge Cases)
+# -------------------------------------------------------------------
+
+def test_generate_sprite_edge_cases(game_instance):
+    """Ensure generate_sprite handles empty and very long seeds safely."""
+    g = game_instance
+
+    # Case 1: Empty seed
+    sprite_empty = g.generate_sprite("")
+    assert isinstance(sprite_empty, list)
+    assert all(isinstance(row, str) for row in sprite_empty)
+    assert len(sprite_empty) > 0
+
+    # Case 2: Very long seed
+    long_seed = "x" * 1000
+    sprite_long = g.generate_sprite(long_seed)
+    assert isinstance(sprite_long, list)
+    assert all(isinstance(row, str) for row in sprite_long)
+    assert len(sprite_long) > 0
+
+    # Case 3: Consistency check
+    row_lengths = {len(row) for row in sprite_long}
+    assert len(row_lengths) == 1  # all rows equal length
+
+# -------------------------------------------------------------------
+# Phase 28c: Edge Guardians (World & Location Edge Cases)
+# -------------------------------------------------------------------
+
+def test_world_and_location_edge_cases():
+    """Ensure World and Location handle empty states safely."""
+    from game.state import World, Location
+
+    # Case 1: World with no locations
+    world = World(name="EmptyWorld", locations=[])
+    assert world.name == "EmptyWorld"
+    assert isinstance(world.locations, list)
+    assert len(world.locations) == 0
+
+    # Case 2: Location with no description or exits
+    loc = Location(name="Void", description="", exits={})
+    assert loc.name == "Void"
+    assert loc.description == ""
+    assert isinstance(loc.exits, dict)
+    assert len(loc.exits) == 0
+
+    # Ensure stringification or repr doesn’t crash
+    assert "Void" in str(loc)
+    assert "EmptyWorld" in str(world)
+
+# -------------------------------------------------------------------
+# Phase 28d: Regression Guardians (Final Export Covenant)
+# -------------------------------------------------------------------
+
+def test_export_functions_consistency(game_instance):
+    """Ensure export_events and export_data always return consistent structures."""
+    # Clear logs and traits
+    game_instance.timeline_log = []
+    game_instance.event_log = []
+    game_instance.llm_character.traits = {}
+
+    # Case 1: export_events always returns a list
+    events_json = game_instance.export_events()
+    events = json.loads(events_json) # Parse the JSON string
+    assert isinstance(events, list)
+    assert events == []
+
+    # Case 2: export_data always includes top-level keys
+    exported_str = game_instance.export_data()
+    exported = json.loads(exported_str)
+
+    for key in ["timeline_log", "event_log", "traits", "timestamp", "version"]:
+        assert key in exported

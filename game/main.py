@@ -233,6 +233,22 @@ def draw_chat_bubble(surface, text, position, font, duration=3000, start_time=No
         text_y += text_surface.get_height()
 
 
+def menu(prompt: str, options: list[str]) -> str | None:
+    """Simple text menu for choosing from options. Returns the chosen option or None if invalid/empty."""
+    if not options:
+        return None
+    while True:
+        print(prompt)
+        for i, opt in enumerate(options, 1):
+            print(f"{i}. {opt}")
+        choice = input("> ").strip()
+        if choice.isdigit():
+            idx = int(choice) - 1
+            if 0 <= idx < len(options):
+                return options[idx]
+        # loop continues until valid input
+
+
 def render_dashboard_content(game_instance) -> str:
     """
     Return a string snapshot of the dashboard for the current game state.
@@ -258,16 +274,20 @@ def render_dashboard_content(game_instance) -> str:
         lines.append("No companion present.")
 
     # Timeline log
+    lines.append("Timeline:")
     if getattr(game_instance, "timeline_log", []):
-        lines.append("Timeline:")
         for entry in game_instance.timeline_log:
             lines.append(f"- {entry}")
+    else:
+        lines.append("- (empty)")
 
     # Event log
+    lines.append("Events:")
     if getattr(game_instance, "event_log", []):
-        lines.append("Events:")
         for entry in game_instance.event_log:
             lines.append(f"- {entry}")
+    else:
+        lines.append("- (empty)")
 
     # Footer
     lines.append("==========================")
@@ -638,10 +658,18 @@ class Game:
         data = {
             "player": {"x": self.player.x, "y": self.player.y, "name": self.player.name},
             "llm_character": llm_char_data,
+            "timeline_log": self.timeline_log,
+            "event_log": self.event_log,
+            "traits": dict(getattr(self.llm_character, "traits", {})), # Add traits at top level
             "timestamp": pygame.time.get_ticks(), # Using pygame ticks as a simple timestamp
             "version": __version__
         }
-        return json.dumps(data, indent=2)
+        def default_json_encoder(obj):
+            if isinstance(obj, (set, object)) and not isinstance(obj, (str, int, float, bool, type(None))):
+                return str(obj)
+            raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
+
+        return json.dumps(data, indent=2, default=default_json_encoder)
 
     def generate_sprite(self, seed: str) -> list[str]:
         """
