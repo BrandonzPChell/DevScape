@@ -5,294 +5,30 @@ Entry point for the game. Handles initialization, event loop, rendering, and
 integration with pixel art rendering and dialogue systems.
 """
 
-import pygame
 import json
 import logging
-import time
 import os
+import random
+import subprocess
+import time
 
+import pygame
+
+from game.rendering import render_dashboard_content, render_pixel_art, draw_chat_bubble
+from game.state import Entity, GameState, LLMCharacter, Location, Player, World
+
+from . import constants
+from .maps import GAME_MAP, MOOD_GLYPHS, TILE_ART_MAP
 from .ollama_ai import OllamaClient, get_llm_move
 
 __version__ = "0.1.0"
 
 # Game constants
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-TILE_SIZE = 32
-FPS = 60
+
 
 # Colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-TRANSPARENT = (0, 0, 0, 0)
-DARK_GREEN = (34, 139, 34)
-LIGHT_GREEN = (60, 179, 113)
-DARK_BLUE = (0, 0, 139)
-LIGHT_BLUE = (135, 206, 250)
-
-COLOR_MAP = {
-    "X": BLACK,
-    "W": WHITE,
-    "R": RED,
-    ".": TRANSPARENT,
-    " ": TRANSPARENT,
-    "G": DARK_GREEN,
-    "g": LIGHT_GREEN,
-    "B": DARK_BLUE,
-    "b": LIGHT_BLUE,
-    "S": (255, 224, 189),  # Skin
-    "H": (139, 69, 19),  # Hair
-    "C": (0, 128, 0),  # Clothes (shirt)
-    "P": (0, 0, 128),  # Pants
-    "F": (139, 69, 19),  # Feet/Shoes
-}
-
-MOOD_GLYPHS = {
-    "neutral": [], # No glyph for neutral
-    "happy": ["..^.^..", ".(o.o).", ".(   ).", r"..\_/..."], # Simple happy face
-    "angry": ["..>.<..", ".(o.o).", ".(---).", r"../\_\.."], # Simple angry face
-    "tired": ["..-.-..", ".(o.o).", ".(   ).", r"..\_/..."], # Simple tired face
-}
-
-# Tile pixel art
-GRASS_TILE_ART = ["GgGg", "gGgG", "GgGg", "gGgG"]
-WATER_TILE_ART = ["BbBb", "bBbB", "BbBb", "bBbB"]
-
-TILE_ART_MAP = {
-    "G": GRASS_TILE_ART,
-    "W": WATER_TILE_ART,
-}
-
-GAME_MAP = [
-    "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGWWWWWWWWWWWWWWWWWWGGGGGGGGGGGG",
-    "GGGGGGGGWWWWWWWWWWWWWWWWWWWWWWGGGGGGGGGG",
-    "GGGGGGGWWWWWWWWWWWWWWWWWWWWWWWWGGGGGGGGG",
-    "GGGGGGWWWWWWWWWWWWWWWWWWWWWWWWWWGGGGGGGG",
-    "GGGGGGWWWWWWWWWWWWWWWWWWWWWWWWWWGGGGGGGG",
-    "GGGGGGWWWWWWWWWWWWWWWWWWWWWWWWWWGGGGGGGG",
-    "GGGGGGWWWWWWWWWWWWWWWWWWWWWWWWWWGGGGGGGG",
-    "GGGGGGWWWWWWWWWWWWWWWWWWWWWWWWWWGGGGGGGG",
-    "GGGGGGWWWWWWWWWWWWWWWWWWWWWWWWWWGGGGGGGG",
-    "GGGGGGGGWWWWWWWWWWWWWWWWWWWWWWGGGGGGGGGG",
-    "GGGGGGGGGGWWWWWWWWWWWWWWWWWWGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-]
-
-
-class Entity:
-    """Represents any object in the game world, like players or NPCs."""
-
-    def __init__(self, name, x, y, art):
-        self.name = name
-        self.x = x  # World coordinates (tile-based)
-        self.y = y
-        self.art = art
-        self.mood = "neutral"  # New mood attribute
-        self.traits = {} # New traits attribute
-
-        # Chat bubble state
-        self.bubble_text = ""
-        self.bubble_start_time = 0
-        self.bubble_duration = 3000  # ms
-        self.bubble_expires = 0
-
-    @property
-    def rect(self):
-        """Get the entity's position and size as a pygame.Rect."""
-        return pygame.Rect(self.x * TILE_SIZE, self.y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
-
-    def move(self, dx, dy, game_map):
-        """Move the entity by dx, dy tiles, respecting map boundaries and preventing diagonal movement."""
-        if dx != 0 and dy != 0:  # Prevent diagonal movement
-            return
-
-        new_x, new_y = self.x + dx, self.y + dy
-        if (
-            0 <= new_y < len(game_map)
-            and 0 <= new_x < len(game_map[0])
-            and game_map[new_y][new_x] != "W"
-        ):
-            self.x, self.y = new_x, new_y
-
-
-def render_pixel_art(surface, pixel_art_lines, rect):
-    """
-    Render pixel art onto a given surface.
-
-    Args:
-        surface (pygame.Surface): The surface to draw on.
-        pixel_art_lines (list[str]): ASCII-like lines representing the art.
-        rect (pygame.Rect): The rectangle area where the art should be drawn.
-    """
-    art_height = len(pixel_art_lines)
-    if art_height == 0:
-        return
-    art_width = len(pixel_art_lines[0])
-    pixel_w = rect.width / art_width
-    pixel_h = rect.height / art_height
-
-    for row_idx, line in enumerate(pixel_art_lines):
-        for col_idx, char in enumerate(line):
-            color = COLOR_MAP.get(char, BLACK)
-            if color != TRANSPARENT:
-                pixel_rect = pygame.Rect(
-                    rect.left + col_idx * pixel_w,
-                    rect.top + row_idx * pixel_h,
-                    pixel_w,
-                    pixel_h,
-                )
-                surface.fill(color, pixel_rect)
-
-
-def draw_text(surface, text, size, rect, color=WHITE):
-    """
-    Draws text onto a surface, centered above a specified rect.
-
-    Args:
-        surface (pygame.Surface): The surface to draw on.
-        text (str): The text content to render.
-        size (int): The font size.
-        rect (pygame.Rect): The rect to position the text relative to.
-        color (tuple, optional): The color of the text. Defaults to WHITE.
-    """
-    font = pygame.font.Font(pygame.font.get_default_font(), size)
-    text_surface = font.render(text, True, color)
-    text_rect = text_surface.get_rect()
-    text_rect.center = (rect.centerx, rect.top - 10)
-    surface.blit(text_surface, text_rect)
-
-
-def draw_chat_bubble(surface, text, position, font, duration=3000, start_time=None, bubble_expires_time=None):
-    """
-    Draw a chat bubble above a character's head.
-
-    Args:
-        surface (pygame.Surface): The surface to draw on.
-        text (str): The message to display.
-        position (tuple): (x, y) coordinates of the character's head.
-        font (pygame.font.Font): Font for rendering text.
-        duration (int): How long (ms) the bubble should last.
-        start_time (int): The tick when the bubble appeared.
-        bubble_expires_time (int): The tick when the bubble should expire.
-    """
-    padding = 6 # Moved padding definition here
-    if not text:
-        return
-
-    # If timing is tracked, fade out after duration
-    if bubble_expires_time is not None:
-        now = pygame.time.get_ticks()
-        if now >= bubble_expires_time:
-            return  # bubble expired
-
-    # Render text
-    wrapped_lines = []
-    words = text.split(' ')
-    current_line = []
-    max_bubble_width = SCREEN_WIDTH // 3  # Example max width for bubble
-
-    for word in words:
-        test_line = ' '.join(current_line + [word])
-        test_width, _ = font.size(test_line)
-        if test_width > max_bubble_width and current_line:
-            wrapped_lines.append(' '.join(current_line))
-            current_line = [word]
-        else:
-            current_line.append(word)
-    wrapped_lines.append(' '.join(current_line))
-
-    text_surfaces = [font.render(line, True, (0, 0, 0)) for line in wrapped_lines]
-    
-    # Calculate bubble dimensions based on wrapped text
-    bubble_width = max(surface.get_width() for surface in text_surfaces) + padding * 2
-    bubble_height = sum(surface.get_height() for surface in text_surfaces) + padding * 2
-
-    # Position bubble slightly above the character
-    bubble_x = position[0] - bubble_width // 2
-    bubble_y = position[1] - bubble_height - 10
-
-    # Draw bubble background (white with black border)
-    bubble_rect = pygame.Rect(bubble_x, bubble_y, bubble_width, bubble_height)
-    pygame.draw.rect(surface, (255, 255, 255), bubble_rect, border_radius=8)
-    pygame.draw.rect(surface, (0, 0, 0), bubble_rect, 2, border_radius=8)
-
-    # Blit text inside bubble
-    text_y = bubble_y + padding
-    for text_surface in text_surfaces:
-        text_x = bubble_x + padding
-        surface.blit(text_surface, (text_x, text_y))
-        text_y += text_surface.get_height()
-
-
-def menu(prompt: str, options: list[str]) -> str | None:
-    """Simple text menu for choosing from options. Returns the chosen option or None if invalid/empty."""
-    if not options:
-        return None
-    while True:
-        print(prompt)
-        for i, opt in enumerate(options, 1):
-            print(f"{i}. {opt}")
-        choice = input("> ").strip()
-        if choice.isdigit():
-            idx = int(choice) - 1
-            if 0 <= idx < len(options):
-                return options[idx]
-        # loop continues until valid input
-
-
-def render_dashboard_content(game_instance) -> str:
-    """
-    Return a string snapshot of the dashboard for the current game state.
-    This function is pure: it does not block, print, or wait for input.
-    """
-    lines = ["=== DevScape Dashboard ==="]
-
-    # Player info
-    if hasattr(game_instance, "player"):
-        lines.append(f"Player: {game_instance.player.name} at ({game_instance.player.x}, {game_instance.player.y})")
-
-    llm_char = getattr(game_instance, "llm_character", None)
-    if llm_char:
-        mood = getattr(llm_char, "mood", "unknown")
-        lines.append(f"Mood: {mood}")
-
-        traits = getattr(llm_char, "traits", {})
-        if traits:
-            trait_str = ", ".join(f"{k}: {v}" for k, v in traits.items())
-            lines.append(f"Traits: {trait_str}")
-    else:
-        # Graceful fallback when no companion is present
-        lines.append("No companion present.")
-
-    # Timeline log
-    lines.append("Timeline:")
-    if getattr(game_instance, "timeline_log", []):
-        for entry in game_instance.timeline_log:
-            lines.append(f"- {entry}")
-    else:
-        lines.append("- (empty)")
-
-    # Event log
-    lines.append("Events:")
-    if getattr(game_instance, "event_log", []):
-        for entry in game_instance.event_log:
-            lines.append(f"- {entry}")
-    else:
-        lines.append("- (empty)")
-
-    # Footer
-    lines.append("==========================")
-
-    return "\n".join(lines)
 
 
 class Game:
@@ -302,7 +38,9 @@ class Game:
         """Initializes the game, screen, entities, and timers."""
         pygame.init()
         pygame.font.init()  # Initialize font module
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.screen = pygame.display.set_mode(
+            (constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT)
+        )
         pygame.display.set_caption("RuneScape-like Pixel Game")
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 24)  # Font for chat
@@ -314,8 +52,8 @@ class Game:
         self.in_chat_mode = False  # Are we currently typing a message?
         self.chat_buffer = ""  # The text being composed
 
-        self.map_width_pixels = len(GAME_MAP[0]) * TILE_SIZE
-        self.map_height_pixels = len(GAME_MAP) * TILE_SIZE
+        self.map_width_pixels = len(GAME_MAP[0]) * constants.TILE_SIZE
+        self.map_height_pixels = len(GAME_MAP) * constants.TILE_SIZE
 
         player_art = [
             "..HHHH..",
@@ -352,10 +90,10 @@ class Game:
         self.camera_offset_y = 0
 
         self.should_speak = True  # New attribute for conditional speech
-        self.planetary_mood = 0.0 # Initialize planetary mood
+        self.planetary_mood = 0.0  # Initialize planetary mood
 
-        self.timeline_log = []       # list of {timestamp, mood, traits}
-        self.event_log = []          # list of {timestamp, event, mood, trait_changes}
+        self.timeline_log = []  # list of {timestamp, mood, traits}
+        self.event_log = []  # list of {timestamp, event, mood, trait_changes}
 
     def show_chat_bubble(self, entity, text: str, duration: int = 3000):
         """Assigns text and timing information to an entity's chat bubble."""
@@ -478,8 +216,10 @@ class Game:
         self.llm_move_timer += dt
 
         # Check for LLM character move
-        while self.llm_move_timer >= self.llm_move_interval: # Change if to while
-            self.llm_move_timer -= self.llm_move_interval # Subtract the interval, don't reset to 0
+        while self.llm_move_timer >= self.llm_move_interval:  # Change if to while
+            self.llm_move_timer -= (
+                self.llm_move_interval
+            )  # Subtract the interval, don't reset to 0
             move_delta = (0, 0)
             dialogue = None
             try:
@@ -496,9 +236,11 @@ class Game:
                 logging.error(f"Error getting LLM move: {e}", exc_info=True)
                 # Fallback to no movement and show a silent indicator
                 move_delta = (0, 0)
-                dialogue = None # Ensure no dialogue is shown on error
+                dialogue = None  # Ensure no dialogue is shown on error
+                if self.should_speak: # Explicitly clear bubble text on error if should_speak is True
+                    self.llm_character.bubble_text = None
 
-            if move_delta == (0, 0) and not self.should_speak: # "none" is now (0,0)
+            if move_delta == (0, 0) and not self.should_speak:  # "none" is now (0,0)
                 mood = getattr(self.llm_character, "mood", "neutral")
                 indicators = {
                     "neutral": "...",
@@ -507,12 +249,17 @@ class Game:
                     "happy": "♪",
                 }
                 indicator = indicators.get(mood, "...")
-                print(f"Calling show_chat_bubble for silent indicator with mood: {mood}") # Debug print
+                print(
+                    f"Calling show_chat_bubble for silent indicator with mood: {mood}"
+                )  # Debug print
                 self.show_chat_bubble(self.llm_character, indicator, duration=1000)
             else:
                 # Apply movement logic
                 dx, dy = move_delta
-                new_llm_x, new_llm_y = self.llm_character.x + dx, self.llm_character.y + dy
+                new_llm_x, new_llm_y = (
+                    self.llm_character.x + dx,
+                    self.llm_character.y + dy,
+                )
 
                 if (
                     0 <= new_llm_y < len(GAME_MAP)
@@ -527,17 +274,21 @@ class Game:
                     self.show_chat_bubble(self.llm_character, dialogue)
 
         # Update camera to center on player
-        self.camera_offset_x = SCREEN_WIDTH // 2 - self.player.x * TILE_SIZE
-        self.camera_offset_y = SCREEN_HEIGHT // 2 - self.player.y * TILE_SIZE
+        self.camera_offset_x = (
+            constants.SCREEN_WIDTH // 2 - self.player.x * constants.TILE_SIZE
+        )
+        self.camera_offset_y = (
+            constants.SCREEN_HEIGHT // 2 - self.player.y * constants.TILE_SIZE
+        )
 
         # Clamp camera to map boundaries
         self.camera_offset_x = min(self.camera_offset_x, 0)
         self.camera_offset_y = min(self.camera_offset_y, 0)
         self.camera_offset_x = max(
-            self.camera_offset_x, SCREEN_WIDTH - self.map_width_pixels
+            self.camera_offset_x, constants.SCREEN_WIDTH - self.map_width_pixels
         )
         self.camera_offset_y = max(
-            self.camera_offset_y, SCREEN_HEIGHT - self.map_height_pixels
+            self.camera_offset_y, constants.SCREEN_HEIGHT - self.map_height_pixels
         )
 
         # Trait evolution
@@ -550,7 +301,8 @@ class Game:
 
             for trait_name, current_value in self.llm_character.traits.items():
                 if trait_name == "patience":  # evolve patience for now
-                    change = base_evolution_rate * dt * mood_factor
+                    change = base_evolution_rate * (dt / 1000) * mood_factor
+                    print(f"DEBUG: dt={dt}, mood_factor={mood_factor}, current_value={current_value}, change={change}")
                     self.llm_character.traits[trait_name] = current_value + change
 
         # Append to timeline log (throttle if needed)
@@ -570,46 +322,59 @@ class Game:
             for col_idx, tile_char in enumerate(row):
                 tile_art = TILE_ART_MAP.get(tile_char)
                 if tile_art:
-                    tile_screen_x = col_idx * TILE_SIZE + self.camera_offset_x
-                    tile_screen_y = row_idx * TILE_SIZE + self.camera_offset_y
+                    tile_screen_x = col_idx * constants.TILE_SIZE + self.camera_offset_x
+                    tile_screen_y = row_idx * constants.TILE_SIZE + self.camera_offset_y
                     # Cull tiles that are off-screen
                     if (
-                        -TILE_SIZE < tile_screen_x < SCREEN_WIDTH
-                        and -TILE_SIZE < tile_screen_y < SCREEN_HEIGHT
+                        -constants.TILE_SIZE < tile_screen_x < constants.SCREEN_WIDTH
+                        and -constants.TILE_SIZE
+                        < tile_screen_y
+                        < constants.SCREEN_HEIGHT
                     ):
                         render_pixel_art(
                             self.screen,
                             tile_art,
                             pygame.Rect(
-                                tile_screen_x, tile_screen_y, TILE_SIZE, TILE_SIZE
+                                tile_screen_x,
+                                tile_screen_y,
+                                constants.TILE_SIZE,
+                                constants.TILE_SIZE,
                             ),
                         )
 
         # Draw entities and their chat bubbles
         for entity in self.entities:
-            entity_screen_x = entity.x * TILE_SIZE + self.camera_offset_x
-            entity_screen_y = entity.y * TILE_SIZE + self.camera_offset_y
+            entity_screen_x = entity.x * constants.TILE_SIZE + self.camera_offset_x
+            entity_screen_y = entity.y * constants.TILE_SIZE + self.camera_offset_y
             render_pixel_art(
                 self.screen,
                 entity.art,
-                pygame.Rect(entity_screen_x, entity_screen_y, TILE_SIZE, TILE_SIZE),
+                pygame.Rect(
+                    entity_screen_x,
+                    entity_screen_y,
+                    constants.TILE_SIZE,
+                    constants.TILE_SIZE,
+                ),
             )
             # Draw mood overlay for llm_character
-            if entity == self.llm_character and entity.mood in MOOD_GLYPHS and MOOD_GLYPHS[entity.mood]:
+            if (
+                entity == self.llm_character
+                and entity.mood in MOOD_GLYPHS
+                and MOOD_GLYPHS[entity.mood]
+            ):
                 mood_art = MOOD_GLYPHS[entity.mood]
                 # Position overlay slightly above and to the right of the character
                 overlay_rect = pygame.Rect(
-                    entity_screen_x + TILE_SIZE // 2,
-                    entity_screen_y - TILE_SIZE // 2,
-                    TILE_SIZE // 2,
-                    TILE_SIZE // 2,
+                    entity_screen_x + constants.TILE_SIZE // 2,
+                    constants.TILE_SIZE // 2,
+                    constants.TILE_SIZE // 2,
                 )
                 render_pixel_art(self.screen, mood_art, overlay_rect)
 
             # Draw chat bubble if active
             if entity.bubble_text:
                 # Position bubble above the entity's head
-                bubble_pos_x = entity_screen_x + TILE_SIZE // 2
+                bubble_pos_x = entity_screen_x + constants.TILE_SIZE // 2
                 bubble_pos_y = entity_screen_y
                 draw_chat_bubble(
                     self.screen,
@@ -623,7 +388,9 @@ class Game:
 
         # Draw chat input box if typing
         if self.is_typing:
-            input_box_rect = pygame.Rect(50, SCREEN_HEIGHT - 50, SCREEN_WIDTH - 100, 40)
+            input_box_rect = pygame.Rect(
+                50, constants.SCREEN_HEIGHT - 50, constants.SCREEN_WIDTH - 100, 40
+            )
             pygame.draw.rect(self.screen, WHITE, input_box_rect, border_radius=5)
             pygame.draw.rect(self.screen, BLACK, input_box_rect, 2, border_radius=5)
             input_text_surface = self.font.render(self.input_text + "|", True, BLACK)
@@ -636,7 +403,7 @@ class Game:
     def run(self):
         """Runs the main game loop."""
         while self.running:
-            dt = self.clock.tick(FPS)
+            dt = self.clock.tick(constants.FPS)
             self.handle_events()
             self.update(dt)
             self.render()
@@ -653,21 +420,37 @@ class Game:
         """
         llm_char_data = {}
         if self.llm_character:
-            llm_char_data = {"x": self.llm_character.x, "y": self.llm_character.y, "name": self.llm_character.name, "mood": self.llm_character.mood}
+            llm_char_data = {
+                "x": self.llm_character.x,
+                "y": self.llm_character.y,
+                "name": self.llm_character.name,
+                "mood": self.llm_character.mood,
+            }
 
         data = {
-            "player": {"x": self.player.x, "y": self.player.y, "name": self.player.name},
+            "player": {
+                "x": self.player.x,
+                "y": self.player.y,
+                "name": self.player.name,
+            },
             "llm_character": llm_char_data,
             "timeline_log": self.timeline_log,
             "event_log": self.event_log,
-            "traits": dict(getattr(self.llm_character, "traits", {})), # Add traits at top level
-            "timestamp": pygame.time.get_ticks(), # Using pygame ticks as a simple timestamp
-            "version": __version__
+            "traits": dict(
+                getattr(self.llm_character, "traits", {})
+            ),  # Add traits at top level
+            "timestamp": pygame.time.get_ticks(),  # Using pygame ticks as a simple timestamp
+            "version": __version__,
         }
+
         def default_json_encoder(obj):
-            if isinstance(obj, (set, object)) and not isinstance(obj, (str, int, float, bool, type(None))):
+            if isinstance(obj, (set, object)) and not isinstance(
+                obj, (str, int, float, bool, type(None))
+            ):
                 return str(obj)
-            raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
+            raise TypeError(
+                f"Object of type {obj.__class__.__name__} is not JSON serializable"
+            )
 
         return json.dumps(data, indent=2, default=default_json_encoder)
 
@@ -677,8 +460,8 @@ class Game:
         This is a placeholder implementation.
         """
         if not seed:
-            return ["....", ".##.", ".##.", "...."] # Default fallback sprite
-        
+            return ["....", ".##.", ".##.", "...."]  # Default fallback sprite
+
         # Simple example: vary sprite based on seed length
         if len(seed) % 2 == 0:
             return ["XXXX", "X..X", "X..X", "XXXX"]
@@ -693,7 +476,7 @@ class Game:
         lore_data = {
             "arc": "The journey of the lone traveler.",
             "glyphs": ["ancient rune", "mystic symbol"],
-            "lineage": "Descendants of the first star-gazers."
+            "lineage": "Descendants of the first star-gazers.",
         }
         return json.dumps(lore_data, indent=2)
 
@@ -732,8 +515,6 @@ class Game:
         if hasattr(self, "llm_character"):
             self.llm_character.mood = mood if mood.lower() in mood_map else "neutral"
 
-
-
     def apply_planetary_event(self, event: str):
         """
         Apply a planetary event that influences both planetary mood and character traits.
@@ -770,7 +551,7 @@ class Game:
             "timestamp": time.time(),
             "event": event,
             "mood": self.llm_character.mood,
-            "traits": dict(self.llm_character.traits), # copy
+            "traits": dict(self.llm_character.traits),  # copy
         }
         self.event_log.append(entry)
 
@@ -781,7 +562,6 @@ class Game:
         """
         return json.dumps(self.timeline_log, indent=2)
 
-
     def export_trait_chart(self) -> str:
         """
         Export current trait values and optionally aggregate history.
@@ -790,11 +570,12 @@ class Game:
         traits = getattr(self.llm_character, "traits", {})
         chart = {
             "traits": traits,
-            "timestamp": self.timeline_log[-1]["timestamp"] if self.timeline_log else None,
+            "timestamp": (
+                self.timeline_log[-1]["timestamp"] if self.timeline_log else None
+            ),
             "history_length": len(self.timeline_log),
         }
         return json.dumps(chart, indent=2)
-
 
     def export_constellation(self) -> str:
         """
@@ -866,7 +647,6 @@ class Game:
         }
         return json.dumps(badge_json, indent=2)
 
-
     def export_covenant_badge(self, contributing_ok: bool, conduct_ok: bool) -> str:
         """
         Generate a covenant badge showing whether CONTRIBUTING.md and CODE_OF_CONDUCT.md are valid.
@@ -874,7 +654,9 @@ class Game:
         status = "passing" if contributing_ok and conduct_ok else "failing"
         color = "brightgreen" if status == "passing" else "red"
 
-        badge_md = f"![Covenants](https://img.shields.io/badge/covenants-{status}-{color})"
+        badge_md = (
+            f"![Covenants](https://img.shields.io/badge/covenants-{status}-{color})"
+        )
         badge_json = {
             "type": "covenants",
             "status": status,
@@ -883,7 +665,6 @@ class Game:
         }
         return json.dumps(badge_json, indent=2)
 
-
     def export_lineage_badge(self) -> str:
         """
         Generate a lineage badge showing the number of timeline entries (ancestral depth).
@@ -891,7 +672,9 @@ class Game:
         depth = len(getattr(self, "timeline_log", []))
         color = "blue" if depth > 0 else "lightgrey"
 
-        badge_md = f"![Lineage](https://img.shields.io/badge/lineage-{depth}_entries-{color})"
+        badge_md = (
+            f"![Lineage](https://img.shields.io/badge/lineage-{depth}_entries-{color})"
+        )
         badge_json = {
             "type": "lineage",
             "entries": depth,
@@ -907,7 +690,10 @@ class Game:
         """
         try:
             while True:
-                os.system("cls" if os.name == "nt" else "clear")
+                if os.name == "nt":
+                    subprocess.run(["cls"], shell=True)
+                else:
+                    subprocess.run(["clear"])
                 content = render_dashboard_content(self)
                 print(content)
 
