@@ -5,11 +5,137 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  schedule:
+    - cron: '0 0 * * *' # Run daily at midnight UTC
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox # pre-commit is run in a separate job
+          pip install -r game/requirements.txt # Install project dependencies
+
+      - name: Run Tox environments
+        run: tox
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: .coverage # Codecov expects a .coverage file by default
+          fail_ci_if_error: true # Optional: Don't fail CI if Codecov upload fails
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: html-coverage-report-${{ matrix.python-version }}
+          path: htmlcov/
+
+  build-and-test-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
+          pip install -r game/requirements.txt
+
+      - name: Run Guardians (PowerShell)
+        run: .\Invoke-Guardians.ps1 -Target all_tox_guardians
+        shell: pwsh
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: .coverage # Codecov expects a .coverage file by default
+          fail_ci_if_error: true # Optional: Don't fail CI if Codecov upload fails
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: html-coverage-report-windows-${{ matrix.python-version }}
+          path: htmlcov/
+
+  build-and-test-macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
+          pip install -r game/requirements.txt
+
+      - name: Run Tox environments
+        run: tox
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: .coverage
+          fail_ci_if_error: true
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: html-coverage-report-macos-${{ matrix.python-version }}
+          path: htmlcov/
+
+  scheduled-safety-scan:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -17,12 +143,10 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: "3.13"
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r game/requirements.txt
+      - name: Install tox
+        run: pip install tox
 
-      - name: Run Guardians (format, lint, test, coverage)
-        run: make guardians
+      - name: Run safety scan
+        run: tox -e safety
