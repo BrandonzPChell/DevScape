@@ -1,0 +1,17 @@
+{
+  "glyphs": [
+    {
+      "description": "A new seed has been planted.",
+      "glyph": "\u00f0\u0178\u0152\u00b1",
+      "trait": "new_contributor"
+    },
+    {
+      "description": "The first spark of creation.",
+      "glyph": "\u00f0\u0178\u201d\u00a5",
+      "trait": "first_commit"
+    }
+  ],
+  "overlay_id": "trait-evolution-alpha",
+  "title": "Trait Evolution",
+  "version": 1.0
+}

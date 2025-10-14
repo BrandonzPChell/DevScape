@@ -1,3 +1,5 @@
+"""A script to celebrate successful pre-commit checks."""
+
 import random
 
 blessings = [
@@ -8,4 +10,7 @@ blessings = [
     "⚔️ No errors remain. The shrine is defended by eternal watch.",
 ]
 
-print(random.choice(blessings).encode('utf-8').decode('utf-8'))
+try:
+    print(random.choice(blessings))
+except UnicodeEncodeError:
+    print("The shrine is whole. All guardians rejoice in harmony.")

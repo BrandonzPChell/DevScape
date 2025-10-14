@@ -34,13 +34,15 @@ IF %ERRORLEVEL% NEQ 0 (
 
 REM --- Install/Update Dependencies ---
 ECHO Checking for Python dependencies...
-pip install -r game/requirements.txt
-IF %ERRORLEVEL% NEQ 0 (
-    ECHO ERROR: Failed to install Python dependencies.
-    PAUSE
-    EXIT /b 1
-)
+pip install -r src/devscape/requirements.txt
+    IF %ERRORLEVEL% NEQ 0 (
+        ECHO ERROR: Failed to install Python dependencies.
+        PAUSE
+        EXIT /b 1
+    )
 
+    ECHO Installing project in editable mode...
+    pip install -e .
 REM --- Launch the shrine ---
 ECHO Launching DevScape...
 python run_game.py

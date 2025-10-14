@@ -1,7 +1,9 @@
 ============================= test session starts =============================
 platform win32 -- Python 3.13.8, pytest-8.4.2, pluggy-1.6.0
 rootdir: C:\Users\BigTe\OneDrive\Desktop\DevScape
+configfile: pytest.ini
 plugins: cov-7.0.0
-collected 1 item
+collected 82 items / 79 deselected / 3 selected
+run-last-failure: rerun previous 3 failures
 
-game\test_game.py 
+game\test_main.py F

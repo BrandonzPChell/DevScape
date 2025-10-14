@@ -1,0 +1,39 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.8, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\BigTe\OneDrive\Desktop\DevScape\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\BigTe\OneDrive\Desktop\DevScape
+configfile: pytest.ini
+plugins: cov-7.0.0
+collecting ... collected 1 item
+
+tests/test_ollama_ai.py::test_get_llm_move_success Mock response object: <Mock id='1149884811312'>
+Mock response object text: {"message": {"content": "MOVE:"}}
+{"message": {"content": " righ"}}
+{"message": {"content": "t | S"}}
+{"message": {"content": "AY: I"}}
+{"message": {"content": " will"}}
+{"message": {"content": " adva"}}
+{"message": {"content": "nce."}}
+{"done": true}
+
+PASSED
+
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.13.8-final-0 _______________
+
+Name                            Stmts   Miss  Cover   Missing
+-------------------------------------------------------------
+src\devscape\__init__.py            0      0   100%
+src\devscape\badges.py             45     45     0%   7-101
+src\devscape\constants.py          50     50     0%   2-168
+src\devscape\main.py              325    325     0%   10-774
+src\devscape\maps.py                5      5     0%   8-39
+src\devscape\ollama_ai.py         218    184    16%   41-89, 93-101, 115-134, 146-205, 208-228, 236-254, 300-321, 333-401, 408-416, 428, 438
+src\devscape\rendering.py          87     87     0%   7-181
+src\devscape\state.py             147    147     0%   7-303
+src\devscape\state_manager.py     471    471     0%   1-1471
+-------------------------------------------------------------
+TOTAL                            1348   1314     3%
+Coverage HTML written to dir htmlcov
+Coverage XML written to file coverage.xml
+============================== 1 passed in 0.97s ==============================

@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "C:\Users\BigTe\OneDrive\Desktop\DevScape\run_game.py", line 11, in <module>
+    from game.main import Game
+ModuleNotFoundError: No module named 'game'

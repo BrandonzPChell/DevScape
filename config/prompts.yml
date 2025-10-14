@@ -1,0 +1,29 @@
+- id: welcome_glyph
+  description: "Greets new contributors with a personalized message"
+  context:
+    onboarding: onboarding.yml
+    traits: traits.json
+  template: |
+    Welcome, {{name}}! You are now part of the DevScape lineage.
+    Your role: {{role}}.
+    May your glyphs be legible and your scrolls resilient.
+
+- id: trait_evolution
+  description: "Suggests next trait evolution based on current state"
+  context:
+    traits: traits.json
+    lineage: lineage.db
+  template: |
+    Based on the current traits:
+    {{traits}}
+    What trait should evolve next, and why?
+
+- id: planetary_feedback
+  description: "Generates planetary mood summary from recent invocations"
+  context:
+    mood: mood.json
+    logs: invocations.db
+  template: |
+    The planetary mood is shifting. Based on recent invocations:
+    {{mood}}
+    What message should be broadcast to all stewards?

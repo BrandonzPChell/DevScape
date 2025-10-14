@@ -1,0 +1,6 @@
+ignore-vulnerabilities:
+  - id: CVE-2023-9999
+    package: dev-tool
+    reason: "This package is only used in development and not deployed."
+  - id: CVE-2024-XXXX
+    reason: "Global ignore for a specific CVE ID, e.g., if it's a false positive across all packages."

@@ -1,0 +1,33 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.8, pytest-8.4.2, pluggy-1.6.0
+rootdir: C:\Users\BigTe\OneDrive\Desktop\DevScape
+configfile: pytest.ini
+testpaths: tests
+plugins: cov-7.0.0
+collected 148 items / 8 skipped
+
+tests\test_badges.py ...                                                 [  2%]
+tests\test_draw_text.py .                                                [  2%]
+tests\test_exports.py ....                                               [  5%]
+tests\test_game.py .................................................     [ 38%]
+tests\test_main.py ......................                                [ 53%]
+tests\test_main_apply_planetary_event.py .                               [ 54%]
+tests\test_main_camera_clamp.py ..                                       [ 55%]
+tests\test_main_cover_more.py ..                                         [ 56%]
+tests\test_main_events.py ....                                           [ 59%]
+tests\test_main_exports.py ..                                            [ 60%]
+tests\test_main_game_helpers.py ..                                       [ 62%]
+tests\test_main_helpers_again.py .                                       [ 62%]
+tests\test_main_input_and_send.py ..                                     [ 64%]
+tests\test_main_minimal.py ..                                            [ 65%]
+tests\test_main_overlay.py ...                                           [ 67%]
+tests\test_main_update_chat_and_silent.py ..                             [ 68%]
+tests\test_ollama_ai.py ...                                              [ 70%]
+tests\test_ollama_ai_branches2.py ..                                     [ 72%]
+tests\test_ollama_ai_extra.py ...                                        [ 74%]
+tests\test_ollama_ai_get_move.py ss                                      [ 75%]
+tests\test_ollama_ai_parser.py ........                                  [ 81%]
+tests\test_ollama_ai_parsing.py ....                                     [ 83%]
+tests\test_ollama_ai_requests.py ...                                     [ 85%]
+tests\test_ollama_ai_unit.py ..                                          [ 87%]
+tests\test_rendering.py 

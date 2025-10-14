@@ -1,0 +1,10 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.8, pytest-8.4.2, pluggy-1.6.0
+rootdir: C:\Users\BigTe\OneDrive\Desktop\DevScape
+configfile: pytest.ini
+plugins: cov-7.0.0
+collected 3 items
+
+tests\test_badges.py ...                                                 [100%]
+
+============================== 3 passed in 0.05s ==============================

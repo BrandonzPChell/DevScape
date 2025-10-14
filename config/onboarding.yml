@@ -1,0 +1,19 @@
+# Contributor Welcome Scroll
+# A ceremonial guide for new stewards of DevScape.
+
+title: "The Steward's Journey Begins"
+
+steps:
+  - ritual: "Clone the Archive"
+    incantation: "git clone https://github.com/your-repo/devscape.git"
+    purpose: "To create your local copy of the world's memory."
+
+  - ritual: "Invoke the Guardians"
+    incantation: "pip install -r requirements.txt && pip install -r dev-requirements.txt"
+    purpose: "To awaken the spirits that protect and serve the codebase."
+
+  - ritual: "First Invocation"
+    incantation: "python run_game.py"
+    purpose: "To witness the world and your place within it."
+
+blessing: "May your contributions be a gift to the future."

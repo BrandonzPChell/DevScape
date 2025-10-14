@@ -15,6 +15,7 @@
 | **Windows (3.10–3.13)** | ![Windows](https://github.com/BrandonzPChell/DevScape/actions/workflows/ci.yml/badge.svg?branch=main&job=build-and-test-windows) | [![codecov](https://codecov.io/gh/BrandonzPChell/DevScape/branch/main/graph/badge.svg)](https://codecov.io/gh/BrandonzPChell/DevScape) |
 | **macOS (3.10–3.13)**   | ![macOS](https://github.com/BrandonzPChell/DevScape/actions/workflows/ci.yml/badge.svg?branch=main&job=build-and-test-macos) | [![codecov](https://codecov.io/gh/BrandonzPChell/DevScape/branch/main/graph/badge.svg)](https://codecov.io/gh/BrandonzPChell/DevScape) |
 | **Local Coverage** | ![Coverage](https://img.shields.io/badge/coverage-84%25-brightgreen.svg) | |
+| **Lint** | ![Lint](https://github.com/BrandonzPChell/DevScape/actions/workflows/ci.yml/badge.svg?branch=main&job=lint) | |
 
 ---
 

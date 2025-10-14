@@ -1,0 +1,33 @@
+{
+  "player": {
+    "name": "New Steward",
+    "level": 1,
+    "health": 100,
+    "inventory": []
+  },
+  "traits": [
+    {
+      "trait_id": "wisdom",
+      "level": 3,
+      "description": "Initial wisdom evolution."
+    }
+  ],
+  "quests": [
+    {
+      "quest_id": "The Ancient Scroll",
+      "status": "completed",
+      "progress": 100
+    }
+  ],
+  "planetary_feedback": {
+    "mood": "unrest",
+    "last_event": "2025-10-12T18:04:32.829601",
+    "events_log": [
+      {
+        "event_id": "fd543682-1650-4414-9872-5d7577b396fc",
+        "timestamp": "2025-10-12T18:04:32.829601",
+        "description": "Planetary mood set to unrest."
+      }
+    ]
+  }
+}

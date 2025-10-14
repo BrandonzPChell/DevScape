@@ -6,17 +6,22 @@ This script allows stewards to enter the shrine with a single command:
 """
 
 import os
+
+os.environ["SDL_VIDEODRIVER"] = "dummy"
+
 import sys
+
+from devscape.main import Game
 
 # Ensure the game package is discoverable
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 if CURRENT_DIR not in sys.path:
     sys.path.insert(0, CURRENT_DIR)
 
-from game.main import Game
-
 
 def main():
+    """Initializes and runs the game."""
     game = Game()
     game.run()
 

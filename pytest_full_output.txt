@@ -1,0 +1,278 @@
+[1m============================= test session starts =============================[0m
+platform win32 -- Python 3.13.8, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\BigTe\OneDrive\Desktop\DevScape\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\BigTe\OneDrive\Desktop\DevScape
+configfile: pytest.ini
+testpaths: tests
+plugins: cov-7.0.0
+[1mcollecting ... [0mpygame 2.6.1 (SDL 2.28.4, Python 3.13.8)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+collected 148 items / 8 skipped
+
+tests/test_badges.py::test_covenant_badge [32mPASSED[0m
+tests/test_badges.py::test_coverage_badge [32mPASSED[0m
+tests/test_badges.py::test_lineage_badge [32mPASSED[0m
+tests/test_draw_text.py::test_draw_text [32mPASSED[0m
+tests/test_exports.py::test_export_data [32mPASSED[0m
+tests/test_exports.py::test_export_timeline [32mPASSED[0m
+tests/test_exports.py::test_export_trait_chart [32mPASSED[0m
+tests/test_exports.py::test_export_constellation [32mPASSED[0m
+tests/test_game.py::test_generate_sprite [32mPASSED[0m
+tests/test_game.py::test_export_lore [32mPASSED[0m
+tests/test_game.py::test_generate_overlay_variants [32mPASSED[0m
+tests/test_game.py::test_update_planetary_mood [update_planetary_mood] Input mood: joyful
+[update_planetary_mood] Planetary mood set to: 0.7
+[update_planetary_mood] Before llm_char_in_state.mood update: neutral
+[update_planetary_mood] After llm_char_in_state.mood update: joyful
+[update_planetary_mood] Input mood: some_unknown_mood
+[update_planetary_mood] Planetary mood set to: 0.0
+[update_planetary_mood] Before llm_char_in_state.mood update: joyful
+[update_planetary_mood] After llm_char_in_state.mood update: neutral
+[32mPASSED[0m
+tests/test_game.py::test_apply_planetary_event_festival_and_eclipse [apply_planetary_event] Before event, llm_char.mood: neutral
+[apply_planetary_event] Calling update_planetary_mood with: joyful
+[update_planetary_mood] Input mood: joyful
+[update_planetary_mood] Planetary mood set to: 0.7
+[update_planetary_mood] Before llm_char_in_state.mood update: neutral
+[update_planetary_mood] After llm_char_in_state.mood update: joyful
+[apply_planetary_event] After update_planetary_mood, llm_char.mood: joyful
+[apply_planetary_event] Before event, llm_char.mood: joyful
+[apply_planetary_event] Calling update_planetary_mood with: calm
+[update_planetary_mood] Input mood: calm
+[update_planetary_mood] Planetary mood set to: 0.2
+[update_planetary_mood] Before llm_char_in_state.mood update: joyful
+[update_planetary_mood] After llm_char_in_state.mood update: calm
+[apply_planetary_event] After update_planetary_mood, llm_char.mood: calm
+[32mPASSED[0m
+tests/test_game.py::test_save_timeline_with_mock_io [32mPASSED[0m
+tests/test_game.py::test_save_events_with_mock_io [32mPASSED[0m
+tests/test_game.py::test_save_constellation_with_mock_io [32mPASSED[0m
+tests/test_game.py::test_export_data_structure [32mPASSED[0m
+tests/test_game.py::test_render_pixel_art_calls_surface_methods [32mPASSED[0m
+tests/test_game.py::test_render_dashboard_content_includes_player_and_mood [32mPASSED[0m
+tests/test_game.py::test_render_dashboard_content_includes_last_event [32mPASSED[0m
+tests/test_game.py::test_render_dashboard_content_includes_timeline [32mPASSED[0m
+tests/test_game.py::test_render_pixel_art_empty_glyph [32mPASSED[0m
+tests/test_game.py::test_export_timeline_structure [32mPASSED[0m
+tests/test_game.py::test_export_trait_chart_structure [32mPASSED[0m
+tests/test_game.py::test_export_constellation_structure [32mPASSED[0m
+tests/test_game.py::test_entity_description_includes_name_and_position [32mPASSED[0m
+tests/test_game.py::test_render_dashboard_content_handles_empty_logs [32mPASSED[0m
+tests/test_game.py::test_export_data_handles_missing_llm_character [32mPASSED[0m
+tests/test_game.py::test_render_dashboard_content_includes_multiple_traits [32mPASSED[0m
+tests/test_game.py::test_render_dashboard_content_handles_unusual_mood [32mPASSED[0m
+tests/test_game.py::test_render_dashboard_content_handles_empty_traits [32mPASSED[0m
+tests/test_game.py::test_render_dashboard_content_handles_missing_llm_character [32mPASSED[0m
+tests/test_game.py::test_render_dashboard_content_with_mixed_logs [32mPASSED[0m
+tests/test_game.py::test_draw_chat_bubble [32mPASSED[0m
+tests/test_game.py::test_export_lineage_badge [32mPASSED[0m
+tests/test_game.py::test_export_covenant_badge [32mPASSED[0m
+tests/test_game.py::test_export_coverage_badge [32mPASSED[0m
+tests/test_game.py::test_entity_move_no_op [32mPASSED[0m
+tests/test_game.py::test_entity_move_diagonal_prevention [32mPASSED[0m
+tests/test_game.py::test_export_timeline_empty [32mPASSED[0m
+tests/test_game.py::test_export_events_empty [32mPASSED[0m
+tests/test_game.py::test_integration_player_journey_flow [32mPASSED[0m
+tests/test_game.py::test_integration_trait_evolution_sequence [32mPASSED[0m
+tests/test_game.py::test_coverage_threshold [32mPASSED[0m
+tests/test_game.py::test_integration_large_logs [32mPASSED[0m
+tests/test_game.py::test_render_pixel_art_handles_out_of_range [32mPASSED[0m
+tests/test_game.py::test_render_pixel_art_handles_empty_grid [32mPASSED[0m
+tests/test_game.py::test_integration_export_consistency_flow [32mPASSED[0m
+tests/test_game.py::test_integration_dashboard_snapshot_regression [32mPASSED[0m
+tests/test_game.py::test_integration_entity_edge_names [32mPASSED[0m
+tests/test_game.py::test_export_data_handles_no_llm_character [32mPASSED[0m
+tests/test_game.py::test_integration_massive_trait_dict [32mPASSED[0m
+tests/test_game.py::test_integration_mixed_log_types [32mPASSED[0m
+tests/test_game.py::test_integration_trait_edge_cases [32mPASSED[0m
+tests/test_game.py::test_export_data_includes_timestamp_and_version [32mPASSED[0m
+tests/test_game.py::test_integration_empty_logs_rendering [32mPASSED[0m
+tests/test_game.py::test_export_data_handles_non_serializable_entries [32mPASSED[0m
+tests/test_main.py::TestGame::test_apply_planetary_event [apply_planetary_event] Before event, llm_char.mood: neutral
+[apply_planetary_event] Calling update_planetary_mood with: anxious
+[update_planetary_mood] Input mood: anxious
+[update_planetary_mood] Planetary mood set to: -0.3
+[update_planetary_mood] Before llm_char_in_state.mood update: neutral
+[update_planetary_mood] After llm_char_in_state.mood update: anxious
+[apply_planetary_event] After update_planetary_mood, llm_char.mood: anxious
+[apply_planetary_event] Before event, llm_char.mood: anxious
+[apply_planetary_event] Calling update_planetary_mood with: calm
+[update_planetary_mood] Input mood: calm
+[update_planetary_mood] Planetary mood set to: 0.2
+[update_planetary_mood] Before llm_char_in_state.mood update: anxious
+[update_planetary_mood] After llm_char_in_state.mood update: calm
+[apply_planetary_event] After update_planetary_mood, llm_char.mood: calm
+[apply_planetary_event] Before event, llm_char.mood: calm
+[apply_planetary_event] Calling update_planetary_mood with: joyful
+[update_planetary_mood] Input mood: joyful
+[update_planetary_mood] Planetary mood set to: 0.7
+[update_planetary_mood] Before llm_char_in_state.mood update: calm
+[update_planetary_mood] After llm_char_in_state.mood update: joyful
+[apply_planetary_event] After update_planetary_mood, llm_char.mood: joyful
+[apply_planetary_event] Before event, llm_char.mood: joyful
+[apply_planetary_event] Calling update_planetary_mood with: neutral
+[update_planetary_mood] Input mood: neutral
+[update_planetary_mood] Planetary mood set to: 0.0
+[update_planetary_mood] Before llm_char_in_state.mood update: joyful
+[update_planetary_mood] After llm_char_in_state.mood update: neutral
+[apply_planetary_event] After update_planetary_mood, llm_char.mood: neutral
+[32mPASSED[0m
+tests/test_main.py::TestGame::test_export_constellation [32mPASSED[0m
+tests/test_main.py::TestGame::test_export_covenant_badge [32mPASSED[0m
+tests/test_main.py::TestGame::test_export_coverage_badge [32mPASSED[0m
+tests/test_main.py::TestGame::test_export_data [32mPASSED[0m
+tests/test_main.py::TestGame::test_export_data_no_llm_traits [32mPASSED[0m
+tests/test_main.py::TestGame::test_export_events [32mPASSED[0m
+tests/test_main.py::TestGame::test_export_lineage_badge [32mPASSED[0m
+tests/test_main.py::TestGame::test_export_lore [32mPASSED[0m
+tests/test_main.py::TestGame::test_export_timeline [32mPASSED[0m
+tests/test_main.py::TestGame::test_export_trait_chart [32mPASSED[0m
+tests/test_main.py::TestGame::test_generate_overlay [32mPASSED[0m
+tests/test_main.py::TestGame::test_generate_sprite [32mPASSED[0m
+tests/test_main.py::TestGame::test_save_constellation [32mPASSED[0m
+tests/test_main.py::TestGame::test_save_events [32mPASSED[0m
+tests/test_main.py::TestGame::test_save_timeline [32mPASSED[0m
+tests/test_main.py::TestGame::test_update_camera_clamping DEBUG: dt=1000, mood_factor=1.0, current_value=10, change=0.1
+[32mPASSED[0m
+tests/test_main.py::TestGame::test_update_llm_move_exception_handling DEBUG: dt=1000, mood_factor=1.0, current_value=10, change=0.1
+[32mPASSED[0m
+tests/test_main.py::TestGame::test_update_llm_move_silent_indicator Calling show_chat_bubble for silent indicator with mood: neutral
+DEBUG: dt=1000, mood_factor=1.0, current_value=10, change=0.1
+[32mPASSED[0m
+tests/test_main.py::TestGame::test_update_llm_move_with_dialogue DEBUG: dt=1000, mood_factor=1.0, current_value=10, change=0.1
+DEBUG: dt=500, mood_factor=1.0, current_value=10.1, change=0.05
+DEBUG: dt=500, mood_factor=1.0, current_value=10.15, change=0.05
+[32mPASSED[0m
+tests/test_main.py::TestGame::test_update_planetary_mood [update_planetary_mood] Input mood: serene
+[update_planetary_mood] Planetary mood set to: 0.5
+[update_planetary_mood] Before llm_char_in_state.mood update: neutral
+[update_planetary_mood] After llm_char_in_state.mood update: serene
+[update_planetary_mood] Input mood: chaotic
+[update_planetary_mood] Planetary mood set to: -0.7
+[update_planetary_mood] Before llm_char_in_state.mood update: serene
+[update_planetary_mood] After llm_char_in_state.mood update: chaotic
+[update_planetary_mood] Input mood: unknown_mood
+[update_planetary_mood] Planetary mood set to: 0.0
+[update_planetary_mood] Before llm_char_in_state.mood update: chaotic
+[update_planetary_mood] After llm_char_in_state.mood update: neutral
+[32mPASSED[0m
+tests/test_main.py::TestGame::test_update_trait_evolution DEBUG: dt=1000, mood_factor=1.5, current_value=10.0, change=0.15000000000000002
+[32mPASSED[0m
+tests/test_main_apply_planetary_event.py::test_apply_planetary_event_variants [apply_planetary_event] Before event, llm_char.mood: neutral
+[apply_planetary_event] Calling update_planetary_mood with: anxious
+[update_planetary_mood] Input mood: anxious
+[update_planetary_mood] Planetary mood set to: -0.3
+[update_planetary_mood] Before llm_char_in_state.mood update: neutral
+[update_planetary_mood] After llm_char_in_state.mood update: anxious
+[apply_planetary_event] After update_planetary_mood, llm_char.mood: anxious
+[apply_planetary_event] Before event, llm_char.mood: anxious
+[apply_planetary_event] Calling update_planetary_mood with: calm
+[update_planetary_mood] Input mood: calm
+[update_planetary_mood] Planetary mood set to: 0.2
+[update_planetary_mood] Before llm_char_in_state.mood update: anxious
+[update_planetary_mood] After llm_char_in_state.mood update: calm
+[apply_planetary_event] After update_planetary_mood, llm_char.mood: calm
+[apply_planetary_event] Before event, llm_char.mood: calm
+[apply_planetary_event] Calling update_planetary_mood with: joyful
+[update_planetary_mood] Input mood: joyful
+[update_planetary_mood] Planetary mood set to: 0.7
+[update_planetary_mood] Before llm_char_in_state.mood update: calm
+[update_planetary_mood] After llm_char_in_state.mood update: joyful
+[apply_planetary_event] After update_planetary_mood, llm_char.mood: joyful
+[apply_planetary_event] Before event, llm_char.mood: joyful
+[apply_planetary_event] Calling update_planetary_mood with: neutral
+[update_planetary_mood] Input mood: neutral
+[update_planetary_mood] Planetary mood set to: 0.0
+[update_planetary_mood] Before llm_char_in_state.mood update: joyful
+[update_planetary_mood] After llm_char_in_state.mood update: neutral
+[apply_planetary_event] After update_planetary_mood, llm_char.mood: neutral
+[32mPASSED[0m
+tests/test_main_camera_clamp.py::test_camera_clamps_inside_world_bounds [32mPASSED[0m
+tests/test_main_camera_clamp.py::test_camera_centering_near_player [32mPASSED[0m
+tests/test_main_cover_more.py::test_game_init_and_entity_lifecycle [32mPASSED[0m
+tests/test_main_cover_more.py::test_game_falls_back_on_missing_methods [32mPASSED[0m
+tests/test_main_events.py::test_apply_planetary_event_storm_decreases_courage [apply_planetary_event] Before event, llm_char.mood: neutral
+[apply_planetary_event] Calling update_planetary_mood with: anxious
+[update_planetary_mood] Input mood: anxious
+[update_planetary_mood] Planetary mood set to: -0.3
+[update_planetary_mood] Before llm_char_in_state.mood update: neutral
+[update_planetary_mood] After llm_char_in_state.mood update: anxious
+[apply_planetary_event] After update_planetary_mood, llm_char.mood: anxious
+[32mPASSED[0m
+tests/test_main_events.py::test_apply_planetary_event_eclipse_increases_focus [apply_planetary_event] Before event, llm_char.mood: neutral
+[apply_planetary_event] Calling update_planetary_mood with: calm
+[update_planetary_mood] Input mood: calm
+[update_planetary_mood] Planetary mood set to: 0.2
+[update_planetary_mood] Before llm_char_in_state.mood update: neutral
+[update_planetary_mood] After llm_char_in_state.mood update: calm
+[apply_planetary_event] After update_planetary_mood, llm_char.mood: calm
+[32mPASSED[0m
+tests/test_main_events.py::test_apply_planetary_event_festival_increases_empathy [apply_planetary_event] Before event, llm_char.mood: neutral
+[apply_planetary_event] Calling update_planetary_mood with: joyful
+[update_planetary_mood] Input mood: joyful
+[update_planetary_mood] Planetary mood set to: 0.7
+[update_planetary_mood] Before llm_char_in_state.mood update: neutral
+[update_planetary_mood] After llm_char_in_state.mood update: joyful
+[apply_planetary_event] After update_planetary_mood, llm_char.mood: joyful
+[32mPASSED[0m
+tests/test_main_events.py::test_apply_planetary_event_unknown_event_resets_mood [apply_planetary_event] Before event, llm_char.mood: neutral
+[apply_planetary_event] Calling update_planetary_mood with: neutral
+[update_planetary_mood] Input mood: neutral
+[update_planetary_mood] Planetary mood set to: 0.0
+[update_planetary_mood] Before llm_char_in_state.mood update: neutral
+[update_planetary_mood] After llm_char_in_state.mood update: neutral
+[apply_planetary_event] After update_planetary_mood, llm_char.mood: neutral
+[32mPASSED[0m
+tests/test_main_exports.py::test_export_constellation_empty_logs [32mPASSED[0m
+tests/test_main_exports.py::test_export_constellation_with_events [32mPASSED[0m
+tests/test_main_game_helpers.py::test_generate_overlay_variants [32mPASSED[0m
+tests/test_main_game_helpers.py::test_render_helper_invoked [32mPASSED[0m
+tests/test_main_helpers_again.py::test_game_helpers_and_overlay_consistency [32mPASSED[0m
+tests/test_main_input_and_send.py::test_handle_text_input_and_backspace_behaviour [32mPASSED[0m
+tests/test_main_input_and_send.py::test_handle_keydown_enter_sends_message_and_handles_exception [32mPASSED[0m
+tests/test_main_minimal.py::test_module_constants [32mPASSED[0m
+tests/test_main_minimal.py::test_game_can_be_instantiated_with_stubbed_dependencies [32mPASSED[0m
+tests/test_main_overlay.py::test_generate_overlay_happy_mood [32mPASSED[0m
+tests/test_main_overlay.py::test_generate_overlay_neutral_mood [32mPASSED[0m
+tests/test_main_overlay.py::test_generate_overlay_unknown_mood_defaults_to_neutral [32mPASSED[0m
+tests/test_main_update_chat_and_silent.py::test_chat_bubble_expiry [32mPASSED[0m
+tests/test_main_update_chat_and_silent.py::test_llm_chat_and_silent_indicators Calling show_chat_bubble for silent indicator with mood: neutral
+[32mPASSED[0m
+tests/test_ollama_ai.py::test_get_llm_move_success Mock response object: <Mock id='2599426838208'>
+Mock response object text: {"message": {"content": "MOVE:"}}
+{"message": {"content": " righ"}}
+{"message": {"content": "t | S"}}
+{"message": {"content": "AY: I"}}
+{"message": {"content": " will"}}
+{"message": {"content": " adva"}}
+{"message": {"content": "nce."}}
+{"done": true}
+
+[32mPASSED[0m
+tests/test_ollama_ai.py::test_get_llm_move_malformed_response [32mPASSED[0m
+tests/test_ollama_ai.py::test_get_llm_move_timeout [32mPASSED[0m
+tests/test_ollama_ai_branches2.py::test_request_text_various_shapes [33mSKIPPED[0m
+tests/test_ollama_ai_branches2.py::test_get_llm_move_transport_error [33mSKIPPED[0m
+tests/test_ollama_ai_extra.py::test_ollama_client_send_request_success [32mPASSED[0m
+tests/test_ollama_ai_extra.py::test_ollama_client_send_request_non200_raises [32mPASSED[0m
+tests/test_ollama_ai_extra.py::test_ollama_client_send_request_chunked_response [32mPASSED[0m
+tests/test_ollama_ai_get_move.py::test_get_llm_move_success [33mSKIPPED[0m
+tests/test_ollama_ai_get_move.py::test_get_llm_move_handles_transport_error [33mSKIPPED[0m
+tests/test_ollama_ai_parser.py::test_parse_content_variants[MOVE: [1,0] | SAY: I will advance.-expected_move0-I will advance.] [32mPASSED[0m
+tests/test_ollama_ai_parser.py::test_parse_content_variants[SAY: Hello there-None-Hello there] [32mPASSED[0m
+tests/test_ollama_ai_parser.py::test_parse_content_variants[MOVE:[-2, 3] SAY: cautiously approach-expected_move2-cautiously approach] [32mPASSED[0m
+tests/test_ollama_ai_parser.py::test_parse_content_variants[MOVE: 0,0-expected_move3-] [32mPASSED[0m
+tests/test_ollama_ai_parser.py::test_parse_content_variants[Completely unrelated text-None-Completely unrelated text] [32mPASSED[0m
+tests/test_ollama_ai_parser.py::test_parse_content_variants[MOVE: [bad, data] SAY: fallback dialogue-None-fallback dialogue] [32mPASSED[0m
+tests/test_ollama_ai_parser.py::test_parse_content_variants[-None-] [32mPASSED[0m
+tests/test_ollama_ai_parser.py::test_parse_content_variants[None-None-] [32mPASSED[0m
+tests/test_ollama_ai_parsing.py::test_send_request_success_json_content [32mPASSED[0m
+tests/test_ollama_ai_parsing.py::test_send_request_success_text_content [32mPASSED[0m
+tests/test_ollama_ai_parsing.py::test_send_request_non200_status_error_handling [32mPASSED[0m
+tests/test_ollama_ai_parsing.py::test_send_request_transport_error_handling [32mPASSED[0m
+tests/test_ollama_ai_requests.py::test_send_request_success_returns_content [32mPASSED[0m
+tests/test_ollama_ai_requests.py::test_send_request_malformed_json_returns_text [32mPASSED[0m
+tests/test_ollama_ai_requests.py::test_send_request_http_error_uses_fallback [32mPASSED[0m
+tests/test_ollama_ai_unit.py::test_send_request_returns_payload_on_success [32mPASSED[0m
+tests/test_ollama_ai_unit.py::test_send_request_raises_on_client_error [32mPASSED[0m
+tests/test_rendering.py::TestDrawChatBubble::test_draw_chat_bubble_basic 

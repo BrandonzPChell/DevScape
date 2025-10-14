@@ -9,7 +9,27 @@ on:
     - cron: '0 0 * * *' # Run daily at midnight UTC
 
 jobs:
+  lint:
+    name: Lint (Ruff + Pylint)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"   # or match your matrix versions
+
+      - name: Install tox
+        run: pip install tox
+
+      - name: Run lint environment
+        run: tox -e lint
+
   build-and-test:
+    needs: lint
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -36,7 +56,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install tox # pre-commit is run in a separate job
+          pip install -e . # Install project in editable mode
           pip install -r game/requirements.txt # Install project dependencies
+          pip install -r dev-requirements.txt # Install development dependencies
 
       - name: Run Tox environments
         run: tox
@@ -54,6 +76,7 @@ jobs:
           path: htmlcov/
 
   build-and-test-windows:
+    needs: lint
     runs-on: windows-latest
     strategy:
       matrix:
@@ -72,7 +95,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install tox
+          pip install -e . # Install project in editable mode
           pip install -r game/requirements.txt
+          pip install -r dev-requirements.txt # Install development dependencies
 
       - name: Run Guardians (PowerShell)
         run: .\Invoke-Guardians.ps1 -Target all_tox_guardians
@@ -91,6 +116,7 @@ jobs:
           path: htmlcov/
 
   build-and-test-macos:
+    needs: lint
     runs-on: macos-latest
     strategy:
       matrix:
@@ -105,19 +131,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Cache pip dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install tox
+          pip install -e . # Install project in editable mode
           pip install -r game/requirements.txt
+          pip install -r dev-requirements.txt # Install development dependencies
 
       - name: Run Tox environments
         run: tox
