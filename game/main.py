@@ -99,18 +99,19 @@ def render_pixel_art(surface, pixel_art_lines, rect):
     """
     art_height = len(pixel_art_lines)
     art_width = len(pixel_art_lines[0])
-    pixel_w = rect.width / art_width
-    pixel_h = rect.height / art_height
 
     for row_idx, line in enumerate(pixel_art_lines):
         for col_idx, char in enumerate(line):
             color = COLOR_MAP.get(char, BLACK)
             if color != TRANSPARENT:
+                # Calculate pixel boundaries without cumulative rounding errors
+                start_x = rect.left + (col_idx * rect.width) // art_width
+                end_x = rect.left + ((col_idx + 1) * rect.width) // art_width
+                start_y = rect.top + (row_idx * rect.height) // art_height
+                end_y = rect.top + ((row_idx + 1) * rect.height) // art_height
+
                 pixel_rect = pygame.Rect(
-                    rect.left + col_idx * pixel_w,
-                    rect.top + row_idx * pixel_h,
-                    pixel_w,
-                    pixel_h,
+                    start_x, start_y, end_x - start_x, end_y - start_y
                 )
                 surface.fill(color, pixel_rect)
 
