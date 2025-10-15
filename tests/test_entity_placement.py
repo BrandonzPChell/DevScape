@@ -1,8 +1,10 @@
-import pytest
 import random
 
+import pytest
+
 from devscape.entity_manager import place_initial_entities
-from devscape.state import Map, LLMCharacter
+from devscape.state import LLMCharacter, Map
+
 
 @pytest.fixture
 def mock_game_map():
@@ -10,11 +12,15 @@ def mock_game_map():
     game_map.generate_map()
     return game_map
 
+
 @pytest.fixture
 def mock_player_position():
     return (5, 5)
 
-def test_place_initial_entities_no_overlap_and_within_bounds(mock_game_map, mock_player_position):
+
+def test_place_initial_entities_no_overlap_and_within_bounds(
+    mock_game_map, mock_player_position
+):
     # Mock random to make entity placement deterministic for testing
     random.seed(42)
 
@@ -31,8 +37,12 @@ def test_place_initial_entities_no_overlap_and_within_bounds(mock_game_map, mock
         assert 0 <= entity.y < mock_game_map.height
 
     # Assert the correct number of enemies and NPCs are placed (within the random range)
-    enemy_count = sum(1 for e in entities.values() if isinstance(e, LLMCharacter) and "enemy" in e.id)
-    npc_count = sum(1 for e in entities.values() if isinstance(e, LLMCharacter) and "npc" in e.id)
+    enemy_count = sum(
+        1 for e in entities.values() if isinstance(e, LLMCharacter) and "enemy" in e.id
+    )
+    npc_count = sum(
+        1 for e in entities.values() if isinstance(e, LLMCharacter) and "npc" in e.id
+    )
 
     # Based on random.seed(42), the expected counts are 3 enemies and 1 NPC
     assert enemy_count == 3

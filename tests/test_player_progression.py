@@ -32,7 +32,9 @@ class TestPlayerProgression(unittest.TestCase):
         self.assertEqual(self.mock_player.max_health, 120)
         self.assertEqual(self.mock_player.health, 120)
         self.assertEqual(self.mock_player.sight_range, 6)
-        self.assertIn("Congratulations! You reached Level 2!", self.mock_game_state.message)
+        self.assertIn(
+            "Congratulations! You reached Level 2!", self.mock_game_state.message
+        )
 
     def test_check_level_up_multiple_level_ups(self):
         """Player should level up multiple times if XP is high enough."""
@@ -40,7 +42,9 @@ class TestPlayerProgression(unittest.TestCase):
         self.mock_player.xp = 300
         self.mock_player.max_health = 100
         self.mock_player.sight_range = 5
-        with patch("devscape.player_progression.LEVEL_UP_THRESHOLDS", {1: 100, 2: 200, 3: 300}):
+        with patch(
+            "devscape.player_progression.LEVEL_UP_THRESHOLDS", {1: 100, 2: 200, 3: 300}
+        ):
             check_level_up(self.mock_game_state, self.mock_player)
         self.assertEqual(self.mock_player.level, 4)
         self.assertEqual(self.mock_player.max_health, 160)
@@ -89,6 +93,7 @@ class TestPlayerProgression(unittest.TestCase):
         self.assertEqual(mock_quest.current_progress, 2)
         self.assertTrue(mock_quest.completed)
         mock_callback.assert_called_once_with(mock_quest)
+
 
 if __name__ == "__main__":
     unittest.main()

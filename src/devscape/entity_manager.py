@@ -96,12 +96,6 @@ def place_initial_entities(
             xp=0,
             level=1,
             dialogue=NPC_DIALOGUE[npc_name],
-
-
-
-
-
-
             entity_type=ENTITY_TYPES["NPC"],
             color=ENTITY_COLORS["NPC"],
             sight_range=PLAYER_SIGHT_RANGE,

@@ -32,8 +32,3 @@ target-version = ["py39"]
 
 [tool.isort]
 profile = "black"
-
-[tool.flake8]
-max-line-length = 88
-exclude = [".venv", ".git", "__pycache__", "docs", "build", "dist", ".tox", "pip/_vendor"]
-ignore = ["E203", "W503"] # E203: whitespace before ':', W503: line break before binary operator

@@ -143,6 +143,7 @@ def test_event_bus_records_lineage_for_item_acquired():
         "payload": event_payload,
     }
 
+
 def test_event_bus_subscribe_and_publish_basic():
     event_bus = engine.EventBus()
     mock_listener = MagicMock()

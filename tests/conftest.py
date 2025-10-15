@@ -1,8 +1,8 @@
 # conftest.py
 import json
+from unittest.mock import MagicMock
 
 import pytest
-from unittest.mock import MagicMock
 
 from devscape.main import Game
 
@@ -36,10 +36,15 @@ def mock_state_manager():
     mock_sm.game_state.player.id = "player_1"
     mock_sm.game_state.player.bubble_text = ""
     mock_sm.game_state.player.bubble_expires = 0
-    mock_sm.game_state.entities.get.return_value = MagicMock(id="llm_char_1", x=1, y=1, bubble_text="", bubble_expires=0)
+    mock_sm.game_state.entities.get.return_value = MagicMock(
+        id="llm_char_1", x=1, y=1, bubble_text="", bubble_expires=0
+    )
     mock_sm.get_game_state.return_value.in_chat_mode = False
     mock_sm.get_game_state.return_value.chat_buffer = ""
-    mock_sm.get_all_entities.return_value = {"player_1": mock_sm.game_state.player, "llm_char_1": mock_sm.game_state.entities.get.return_value}
+    mock_sm.get_all_entities.return_value = {
+        "player_1": mock_sm.game_state.player,
+        "llm_char_1": mock_sm.game_state.entities.get.return_value,
+    }
     return mock_sm
 
 

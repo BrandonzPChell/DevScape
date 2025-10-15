@@ -56,9 +56,8 @@ class TestCoverageBadge:
 
     def test_to_markdown(self):
         badge = CoverageBadge(coverage_percent=85)
-        assert (
-            badge.to_markdown()
-            == "![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen)"
+        assert badge.to_markdown() == (
+            "![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen)"
         )
 
     def test_to_json_str(self):
@@ -83,9 +82,8 @@ class TestLineageBadge:
 
     def test_to_markdown(self):
         badge = LineageBadge(depth=10)
-        assert (
-            badge.to_markdown()
-            == "![Lineage](https://img.shields.io/badge/lineage-10_entries-blue)"
+        assert badge.to_markdown() == (
+            "![Lineage](https://img.shields.io/badge/lineage-10_entries-blue)"
         )
 
     def test_to_json_str(self):
