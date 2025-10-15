@@ -78,3 +78,30 @@ def test_render_pixel_art_offset(pygame_init):
     # Check a pixel outside the rendered area to ensure it's transparent
     actual_color_outside = surface.get_at((0, 0))
     assert actual_color_outside[3] == 0
+
+
+def test_render_pixel_art_rounding_error(pygame_init):
+    """
+    Tests that render_pixel_art completely fills the destination rect, even
+    when the art dimensions are not perfect divisors of the rect dimensions.
+    This test is designed to fail with the original implementation due to
+    floating-point rounding errors.
+    """
+    surface = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA)
+    surface.fill(TRANSPARENT)
+
+    # Use art dimensions that don't divide TILE_SIZE cleanly (e.g., 7x7)
+    pixel_art = ["X" * 7] * 7
+    rect = pygame.Rect(0, 0, TILE_SIZE, TILE_SIZE)
+    render_pixel_art(surface, pixel_art, rect)
+
+    # Check the bottom-right pixel. Due to rounding errors, this pixel might
+    # not be drawn by the original implementation.
+    bottom_right_pixel_color = surface.get_at((TILE_SIZE - 1, TILE_SIZE - 1))
+
+    # The expected color is the one mapped to 'X'
+    expected_color = COLOR_MAP["X"]
+
+    # Assert that the pixel is not transparent and has the correct color
+    assert bottom_right_pixel_color[3] == 255
+    assert bottom_right_pixel_color[:3] == expected_color[:3]
