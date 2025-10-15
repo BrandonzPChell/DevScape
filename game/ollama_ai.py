@@ -52,16 +52,21 @@ class OllamaClient:
 
     def _parse_response(self, response_text):
         """Parses the LLM's response to extract the move and dialogue."""
-        move = "stay"
-        dialogue = "..."
-        if "|" in response_text:
-            parts = response_text.split("|")
-            move_part = parts[0].replace("MOVE:", "").strip().lower()
-            dialogue_part = parts[1].replace("SAY:", "").strip()
+        import re
 
-            if move_part in ["up", "down", "left", "right", "stay"]:
-                move = move_part
-            dialogue = dialogue_part
+        move_match = re.search(r"MOVE:\s*(\w+)", response_text, re.IGNORECASE)
+        say_match = re.search(r"SAY:\s*(.*)", response_text, re.IGNORECASE)
+
+        move = "stay"
+        if move_match:
+            parsed_move = move_match.group(1).lower()
+            if parsed_move in ["up", "down", "left", "right", "stay"]:
+                move = parsed_move
+
+        dialogue = "..."
+        if say_match:
+            dialogue = say_match.group(1).strip()
+
         return move, dialogue
 
     def get_move(self, player_x, player_y, llm_x, llm_y, game_map):
