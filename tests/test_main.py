@@ -77,9 +77,9 @@ with (
                     mood="neutral",
                     traits={"patience": 10, "courage": 5, "focus": 5, "empathy": 5},
                 )
-                self.game.state_manager.game_state.entities[test_llm_char.id] = (
-                    test_llm_char
-                )
+                self.game.state_manager.game_state.entities[
+                    test_llm_char.id
+                ] = test_llm_char
                 self.game.llm_character_id = test_llm_char.id
 
             # Now, get the actual LLMCharacter object that the game is using
@@ -250,7 +250,8 @@ with (
                 # max(100 - 320, min(0, -30)) = max(-220, -30) = -30
                 self.assertEqual(self.game.camera_offset_x, -30)
                 self.assertEqual(
-                    self.game.camera_offset_y, 68  # Corrected expected value
+                    self.game.camera_offset_y,
+                    68,  # Corrected expected value
                 )
 
                 # Player at (15,0) - camera should be clamped at right edge

@@ -339,7 +339,6 @@ class GameState:
 
         entities: Dict[str, Entity] = {}  # Explicitly type the dictionary
         for entity_id, entity_data in data["entities"].items():
-
             entity: Entity  # Declare entity before the conditional
             if entity_data["entity_type"] == "PLAYER":
                 # Player is already created, skip

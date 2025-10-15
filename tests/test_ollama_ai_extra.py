@@ -23,9 +23,7 @@ def test_ollama_client_send_request_success(mock_requests_post):
         raise_for_status=lambda: None,
     )
     mock_requests_post.return_value = mock_response
-    out = client._send_request(
-        [{"role": "user", "content": "test"}]
-    )  # pylint: disable=protected-access
+    out = client._send_request([{"role": "user", "content": "test"}])  # pylint: disable=protected-access
 
     assert isinstance(out, dict)
     assert "hello from AI" in out["dialogue"]
@@ -51,9 +49,7 @@ def test_ollama_client_send_request_non200_raises(mock_requests_post):
     client = ollama_ai.OllamaClient(
         api_url="http://localhost:11434/api/chat", model="test"
     )
-    out = client._send_request(
-        [{"role": "user", "content": "test"}]
-    )  # pylint: disable=protected-access
+    out = client._send_request([{"role": "user", "content": "test"}])  # pylint: disable=protected-access
 
     assert isinstance(out, dict)
     assert out["dialogue"] == "Error: LLM request failed with status 500."
@@ -76,9 +72,7 @@ def test_ollama_client_send_request_chunked_response(mock_requests_post):
     client = ollama_ai.OllamaClient(
         api_url="http://localhost:11434/api/chat", model="test"
     )
-    out = client._send_request(
-        [{"role": "user", "content": "test"}]
-    )  # pylint: disable=protected-access
+    out = client._send_request([{"role": "user", "content": "test"}])  # pylint: disable=protected-access
 
     assert isinstance(out, dict)
     assert "part1part2part3" in out["dialogue"]

@@ -54,7 +54,6 @@ def mock_game_dependencies(monkeypatch):
 
 
 def test_export_constellation_empty_logs():
-
     game = Game()
     game.llm_character_id = "llm_1"
     game.state_manager.get_game_state().entities["llm_1"].traits = {}

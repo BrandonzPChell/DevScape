@@ -137,7 +137,7 @@ def render_dashboard_content(game_instance) -> str:
     # Player info
     player = game_instance.state_manager.get_game_state().player
     if player:
-        lines.append(f"Player: {player.name} at " f"({player.x}, {player.y})")
+        lines.append(f"Player: {player.name} at ({player.x}, {player.y})")
 
     llm_char = None
     for entity in game_instance.state_manager.get_game_state().entities.values():

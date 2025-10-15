@@ -1,0 +1,9 @@
+"Summoning the All-Guardians Scroll before push..."
+C:\Users\BigTe\OneDrive\Desktop\DevScape\.venv\Scripts\ruff.exe check . --fix
+C:\Users\BigTe\OneDrive\Desktop\DevScape\.venv\Scripts\ruff.exe format .
+if ($LASTEXITCODE -ne 0) {
+    "The guardians have spoken: push aborted."
+    exit 1
+}
+"The guardians have approved the push."
+exit 0

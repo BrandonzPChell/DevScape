@@ -7,7 +7,6 @@ from devscape import persistence
 
 
 class TestPersistence(unittest.TestCase):
-
     def setUp(self):
         # Create a temporary directory for test files
         self.test_dir = tempfile.TemporaryDirectory()

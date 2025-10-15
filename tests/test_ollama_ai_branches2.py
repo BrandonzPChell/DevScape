@@ -25,9 +25,7 @@ def test_request_text_various_shapes(monkeypatch):
     )
     monkeypatch.setattr(requests, "post", mock_requests_post(resp1))
     client1 = mod.OllamaClient(api_url="http://localhost:11434/api/chat", model="test")
-    out1 = client1._send_request(
-        [{"role": "user", "content": "test"}]
-    )  # pylint: disable=protected-access
+    out1 = client1._send_request([{"role": "user", "content": "test"}])  # pylint: disable=protected-access
     assert isinstance(out1, dict) and "hi bytes" in out1["dialogue"]
 
     # object with no .text but .content as str
@@ -40,9 +38,7 @@ def test_request_text_various_shapes(monkeypatch):
     )
     monkeypatch.setattr(requests, "post", mock_requests_post(resp2))
     client2 = mod.OllamaClient(api_url="http://localhost:11434/api/chat", model="test")
-    out2 = client2._send_request(
-        [{"role": "user", "content": "test"}]
-    )  # pylint: disable=protected-access
+    out2 = client2._send_request([{"role": "user", "content": "test"}])  # pylint: disable=protected-access
     assert isinstance(out2, dict) and "plain" in out2["dialogue"]
 
     # iterable / streaming response (simulated as a single response for _send_request)
@@ -55,9 +51,7 @@ def test_request_text_various_shapes(monkeypatch):
     )
     monkeypatch.setattr(requests, "post", mock_requests_post(resp3))
     client3 = mod.OllamaClient(api_url="http://localhost:11434/api/chat", model="test")
-    out3 = client3._send_request(
-        [{"role": "user", "content": "test"}]
-    )  # pylint: disable=protected-access
+    out3 = client3._send_request([{"role": "user", "content": "test"}])  # pylint: disable=protected-access
     assert isinstance(out3, dict) and "ab" in out3["dialogue"]
 
     # non-200 -> expect error handling (returns fallback message)
@@ -72,9 +66,7 @@ def test_request_text_various_shapes(monkeypatch):
     )
     monkeypatch.setattr(requests, "post", mock_requests_post(resp4))
     client4 = mod.OllamaClient(api_url="http://localhost:11434/api/chat", model="test")
-    out4 = client4._send_request(
-        [{"role": "user", "content": "test"}]
-    )  # pylint: disable=protected-access
+    out4 = client4._send_request([{"role": "user", "content": "test"}])  # pylint: disable=protected-access
     assert (
         isinstance(out4, dict)
         and "Error: LLM request failed with status 500." in out4["dialogue"]

@@ -31,9 +31,7 @@ def test_client_send_request_network_and_json_errors(monkeypatch):
                     "_send_request",
                     lambda *a, **k: (_ for _ in ()).throw(RuntimeError("network")),
                 )
-                result = inst._send_request(
-                    [{"role": "user", "content": "test"}]
-                )  # pylint: disable=protected-access
+                result = inst._send_request([{"role": "user", "content": "test"}])  # pylint: disable=protected-access
                 assert isinstance(result, dict)
                 assert result["move"] is None
                 assert result["dialogue"] == "I feel disconnected..."

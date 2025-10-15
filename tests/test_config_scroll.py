@@ -9,7 +9,6 @@ from src.devscape.config_scroll import (
 
 
 class TestConfigScroll(unittest.TestCase):
-
     @patch("builtins.open", new_callable=mock_open, read_data="key: value")
     @patch("yaml.safe_load")
     def test_load_config(self, mock_safe_load, mock_open_file):

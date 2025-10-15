@@ -5,7 +5,6 @@ from src.devscape.ollama_ai import OllamaClient, send_player_message_to_llm
 
 
 class TestOllamaClient(unittest.TestCase):
-
     def setUp(self):
         self.client = OllamaClient()
 

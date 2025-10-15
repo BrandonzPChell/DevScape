@@ -13,7 +13,6 @@ from src.devscape.validation_rituals import (
 
 
 class TestValidationRituals(unittest.TestCase):
-
     def test_recover_traits_from_db(self):
         with TemporaryDirectory() as tmpdir:
             db_path = Path(tmpdir) / "test.db"

@@ -49,9 +49,7 @@ def test_send_request_success_returns_content(client):
     resp = make_response(payload, status_code=200)
 
     with patch("devscape.ollama_ai.requests.post", return_value=resp) as mock_post:
-        result = client._send_request(
-            messages=[{"role": "user", "content": "state"}]
-        )  # pylint: disable=protected-access
+        result = client._send_request(messages=[{"role": "user", "content": "state"}])  # pylint: disable=protected-access
         assert isinstance(result, dict)
         assert "move" in result and "dialogue" in result and "raw" in result
         assert result["dialogue"] == "I will advance."
@@ -65,9 +63,7 @@ def test_send_request_malformed_json_returns_text(client):
     resp = make_response(body_text, status_code=200)
 
     with patch("devscape.ollama_ai.requests.post", return_value=resp) as mock_post:
-        result = client._send_request(
-            messages=[{"role": "user", "content": "state"}]
-        )  # pylint: disable=protected-access
+        result = client._send_request(messages=[{"role": "user", "content": "state"}])  # pylint: disable=protected-access
         assert isinstance(result, dict)
         assert "move" in result and "dialogue" in result and "raw" in result
         assert result["dialogue"] == body_text.strip()
@@ -82,9 +78,7 @@ def test_send_request_http_error_uses_fallback(client):
     with patch("devscape.ollama_ai.requests.post", return_value=resp) as mock_post:
         # Because resp.raise_for_status raises HTTPError, the client._send_request should catch and
         # return the friendly fallback string "I feel disconnected..."
-        result = client._send_request(
-            messages=[{"role": "user", "content": "state"}]
-        )  # pylint: disable=protected-access
+        result = client._send_request(messages=[{"role": "user", "content": "state"}])  # pylint: disable=protected-access
         assert isinstance(result, dict)
         assert result["move"] == {"dx": 0, "dy": 0}
         mock_post.assert_called_once()

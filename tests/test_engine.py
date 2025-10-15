@@ -349,9 +349,7 @@ def test_event_bus_publish_no_listeners():
 def test_handle_state_update_handler_found(mocker):
     mock_load_state = mocker.patch.object(state_scroll, "load_state", return_value={})
     mock_save_state = mocker.patch.object(state_scroll, "save_state")
-    mocker.patch.dict(
-        engine._STATE_UPDATE_HANDLERS, {"test_event": MagicMock()}
-    )  # pylint: disable=protected-access
+    mocker.patch.dict(engine._STATE_UPDATE_HANDLERS, {"test_event": MagicMock()})  # pylint: disable=protected-access
 
     engine.handle_state_update("test_event", {"key": "value"})
 
@@ -410,9 +408,7 @@ def test_update_state_planetary_feedback(mocker):
     mock_datetime = mocker.patch("devscape.engine.datetime")
     mock_datetime.now.return_value = datetime(2023, 1, 1, 12, 0, 0)
 
-    engine._update_state_planetary_feedback(
-        current_state, payload
-    )  # pylint: disable=protected-access
+    engine._update_state_planetary_feedback(current_state, payload)  # pylint: disable=protected-access
 
     assert current_state["planetary_feedback"]["mood"] == "new"
     assert current_state["planetary_feedback"]["last_event"] == "new_time"
@@ -439,9 +435,7 @@ def test_update_state_quest_completed(mocker):
     }
     payload = {"quest_id": "q1", "status": "completed"}
 
-    engine._update_state_quest_completed(
-        current_state, payload
-    )  # pylint: disable=protected-access
+    engine._update_state_quest_completed(current_state, payload)  # pylint: disable=protected-access
 
     assert current_state["quests"][0]["status"] == "completed"
     assert current_state["quests"][1]["status"] == "active"
@@ -451,9 +445,7 @@ def test_update_state_quest_started(mocker):
     current_state = {"quests": []}
     payload = {"quest_id": "q1", "status": "active", "progress": 0}
 
-    engine._update_state_quest_started(
-        current_state, payload
-    )  # pylint: disable=protected-access
+    engine._update_state_quest_started(current_state, payload)  # pylint: disable=protected-access
 
     assert len(current_state["quests"]) == 1
     assert current_state["quests"][0] == {
@@ -467,18 +459,14 @@ def test_update_state_quest_started_already_exists(mocker):
     current_state = {"quests": [{"quest_id": "q1", "status": "active"}]}
     payload = {"quest_id": "q1", "status": "active", "progress": 0}
 
-    engine._update_state_quest_started(
-        current_state, payload
-    )  # pylint: disable=protected-access
+    engine._update_state_quest_started(current_state, payload)  # pylint: disable=protected-access
     assert len(current_state["quests"]) == 1  # Should not add duplicate
 
 
 def test_update_state_item_acquired_new_item(mocker):
     current_state = {"player": {"inventory": []}}
     payload = {"item_id": "sword", "quantity": 1}
-    engine._update_state_item_acquired(
-        current_state, payload
-    )  # pylint: disable=protected-access
+    engine._update_state_item_acquired(current_state, payload)  # pylint: disable=protected-access
 
     assert len(current_state["player"]["inventory"]) == 1
     assert current_state["player"]["inventory"][0] == {
@@ -491,9 +479,7 @@ def test_update_state_item_acquired_existing_item(mocker):
     current_state = {"player": {"inventory": [{"item_id": "sword", "quantity": 1}]}}
     payload = {"item_id": "sword", "quantity": 2}
 
-    engine._update_state_item_acquired(
-        current_state, payload
-    )  # pylint: disable=protected-access
+    engine._update_state_item_acquired(current_state, payload)  # pylint: disable=protected-access
 
     assert len(current_state["player"]["inventory"]) == 1
     assert current_state["player"]["inventory"][0] == {
@@ -506,9 +492,7 @@ def test_update_state_trait_evolved_new_trait(mocker):
     current_state = {"traits": []}
     payload = {"trait_id": "agility", "new_level": 3, "description": "Agility evolved"}
 
-    engine._update_state_trait_evolved(
-        current_state, payload
-    )  # pylint: disable=protected-access
+    engine._update_state_trait_evolved(current_state, payload)  # pylint: disable=protected-access
 
     assert len(current_state["traits"]) == 1
     assert current_state["traits"][0] == {
@@ -524,9 +508,7 @@ def test_update_state_trait_evolved_existing_trait(mocker):
     }
     payload = {"trait_id": "agility", "new_level": 3, "description": "Agility evolved"}
 
-    engine._update_state_trait_evolved(
-        current_state, payload
-    )  # pylint: disable=protected-access
+    engine._update_state_trait_evolved(current_state, payload)  # pylint: disable=protected-access
 
     assert len(current_state["traits"]) == 1
     assert current_state["traits"][0] == {

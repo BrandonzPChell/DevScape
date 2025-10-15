@@ -32,7 +32,9 @@ def _display_quests(quests):
             status_glyph = (
                 "✅"
                 if q["status"] == "completed"
-                else "⏳" if q["status"] == "active" else "❌"
+                else "⏳"
+                if q["status"] == "active"
+                else "❌"
             )
             quest_banner = (
                 f"[{status_glyph}] {q['quest_id']}: "  # noqa: E122, E501
@@ -121,7 +123,9 @@ def status(name):
             else (
                 "😟"
                 if planetary_mood == "unrest"
-                else "🌟" if planetary_mood == "joy" else "❓"
+                else "🌟"
+                if planetary_mood == "joy"
+                else "❓"
             )
         )
         click.echo(f"  Planetary Mood {mood_glyph}: {planetary_mood}")

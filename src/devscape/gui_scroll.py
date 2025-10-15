@@ -60,12 +60,10 @@ class DevScapeGUI:
         except FileNotFoundError:
             messagebox.showerror(
                 "System Error",
-                "Error: Python executable not found. "
-                "Make sure Python is in your PATH.",
+                "Error: Python executable not found. Make sure Python is in your PATH.",
             )
             return (
-                "Error: Python executable not found. "
-                "Make sure Python is in your PATH."
+                "Error: Python executable not found. Make sure Python is in your PATH."
             )
 
     def get_current_state(self):

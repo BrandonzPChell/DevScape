@@ -15,7 +15,6 @@ from src.devscape.db_scroll import (
 
 
 class TestDbScroll(unittest.TestCase):
-
     def setUp(self):
         self.tmpdir = TemporaryDirectory()
         self.db_path = Path(self.tmpdir.name) / "test.db"
