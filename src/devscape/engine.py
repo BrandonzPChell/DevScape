@@ -19,7 +19,8 @@ def _display_traits(traits):
             empty_blocks = bar_length - filled_blocks
             trait_bar = "█" * filled_blocks + "░" * empty_blocks
             click.echo(
-                f"    - {trait['trait_id']}: {trait_bar} Level {trait['level']} - {trait['description']}"
+                f"    - {trait['trait_id']}: {trait_bar} Level {trait['level']} - "  # noqa: E131, E501
+                f"{trait['description']}"
             )
     else:
         click.echo("    No traits evolved yet.")
@@ -34,10 +35,11 @@ def _display_quests(quests):
                 else "⏳" if q["status"] == "active" else "❌"
             )
             quest_banner = (
-                f"[{status_glyph}] {q['quest_id']}: {q['status']} ({q['progress']}%) "
+                f"[{status_glyph}] {q['quest_id']}: "  # noqa: E122, E501
+                f"{q['status']} ({q['progress']}%) "
             )
             if q["status"] == "completed":
-                quest_banner = f"--- {quest_banner} ---"
+                quest_banner = f"--- {quest_banner} ---"  # noqa: E501
             click.echo(f"    {quest_banner}")
     else:
         click.echo("    No active quests.")
@@ -56,11 +58,15 @@ def _display_lineage(recent_lineage):
 
             if action_type == "Trait Evolved":
                 click.echo(
-                    f"  ✨ [{timestamp}] {contributor} evolved {payload_details.get('trait_id')} to level {payload_details.get('new_level')}."
+                    f"  ✨ [{timestamp}] {contributor} evolved "
+                    f"{payload_details.get('trait_id')} "
+                    f"to level {payload_details.get('new_level')}."
                 )
             elif action_type == "Item Acquired":
                 click.echo(
-                    f"  🎒 [{timestamp}] {contributor} acquired {payload_details.get('quantity')} {payload_details.get('item_id')}(s)."
+                    f"  🎒 [{timestamp}] {contributor} acquired "
+                    f"{payload_details.get('quantity')} "
+                    f"{payload_details.get('item_id')}(s)."
                 )
             else:
                 click.echo(f"  ⏳ [{timestamp}] {contributor} performed {action_type}.")
@@ -97,7 +103,9 @@ def status(name):
         current_state = state_scroll.load_state()
         click.echo("--- Heart's Pulse (Current State) ❤️ ---")
         click.echo(
-            f"  Player: {current_state['player']['name']} (Level {current_state['player']['level']}) Health: {current_state['player']['health']}"
+            f"  Player: {current_state['player']['name']} "
+            f"(Level {current_state['player']['level']}) "
+            f"Health: {current_state['player']['health']}"
         )
 
         click.echo("  Traits ✨:")
@@ -118,7 +126,7 @@ def status(name):
         )
         click.echo(f"  Planetary Mood {mood_glyph}: {planetary_mood}")
         click.echo(
-            f"  Last Planetary Event: {current_state['planetary_feedback']['last_event']}\n"
+            f"  Last Planetary Event: {current_state['planetary_feedback']['last_event']}\n"  # noqa: E501
         )
 
     except FileNotFoundError:
@@ -244,13 +252,15 @@ def complete_quest(quest_id, contributor):
 def trigger_event(event_type, payload):
     """
     Triggers a custom event with a JSON payload.
-    Example: devscape ritual trigger-event trait_evolved '{"trait_id": "wisdom", "new_level": 2, "contributor_id": "Brandon"}'
+    Example: devscape ritual trigger-event trait_evolved \
+        '{"trait_id": "wisdom", "new_level": 2, "contributor_id": "Brandon"}'
     """
     try:
         payload_dict = json.loads(payload)
         event_bus.publish(event_type, payload_dict)
         click.echo(
-            f"Event '{event_type}' triggered successfully with payload: {payload_dict}"
+            f"Event '{event_type}' triggered successfully "  # noqa: E501
+            f"with payload: {payload_dict}"
         )
     except json.JSONDecodeError:
         click.echo("Error: Payload must be a valid JSON string.")

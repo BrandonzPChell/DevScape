@@ -5,7 +5,8 @@ import yaml
 
 def invoke_onboarding_scroll(yaml_path="onboarding.yml", json_path="onboarding.json"):
     """
-    Converts the human-readable onboarding scroll (YAML) into a machine-legible format (JSON).
+    Converts the human-readable onboarding scroll (YAML) into a
+    machine-legible format (JSON).
     """
     try:
         with open(yaml_path, "r", encoding="utf-8") as f:

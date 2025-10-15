@@ -1,34 +1,36 @@
 repos:
-  # Black: uncompromising Python code formatter
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+
+      - id: check-added-large-files
   - repo: https://github.com/psf/black
-    rev: 24.4.2 # Use the latest stable version
+    rev: 25.9.0
     hooks:
       - id: black
-
-  # isort: a Python utility / library to sort imports alphabetically, and automatically separate into sections and by type.
+        language_version: python3
+        args: ["--line-length=88"]
   - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2 # Use the latest stable version
+    rev: 7.0.0
     hooks:
       - id: isort
-
-  # Ruff: fast linter + import sorter + formatter
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.9   # pin to a stable Ruff release
+        args: ["--profile", "black"]
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.3.0
     hooks:
-      - id: ruff
-        name: ruff (lint + fix)
-        args: [--fix]   # auto-fix issues where possible
-      # - id: ruff-format
-      #   name: ruff (format)
-
-  # Pylint: deep semantic checks, runs after Ruff
-  - repo: https://github.com/pycqa/pylint
-    rev: v3.2.6
+      - id: flake8
+        args: ["--max-line-length=88"]
+  - repo: local
     hooks:
-      - id: pylint
-        name: pylint (with tox.ini config)
-        entry: pylint
+      - id: python-compile
+        name: Check python syntax (py_compile)
+        entry: python -m py_compile
         language: system
-        types: [python]
-        args:
-          - --rcfile=tox.ini
+        files: \.py$
+      - id: utf8-check-custom
+        name: Ensure files are valid UTF-8
+        entry: powershell -NoProfile -ExecutionPolicy Bypass -File check_utf8.ps1
+        language: system
+        files: \.py$

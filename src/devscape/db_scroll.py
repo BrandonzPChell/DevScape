@@ -67,7 +67,8 @@ def record_trait_evolution(
     """
     conn = _get_db_connection()
     conn.execute(
-        "INSERT INTO traits_evolution (trait_id, contributor_id, old_level, new_level, details) VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO traits_evolution (trait_id, contributor_id, old_level, "
+        "new_level, details) VALUES (?, ?, ?, ?, ?)",
         (trait_id, contributor_id, old_level, new_level, details),
     )
     conn.commit()
@@ -107,7 +108,8 @@ def fetch_trait_evolution(trait_id: Optional[str] = None, limit: int = 100):
     conn = _get_db_connection()
     if trait_id:
         cursor = conn.execute(
-            "SELECT * FROM traits_evolution WHERE trait_id = ? ORDER BY timestamp DESC LIMIT ?",
+            "SELECT * FROM traits_evolution WHERE trait_id = ? "
+            "ORDER BY timestamp DESC LIMIT ?",
             (
                 trait_id,
                 limit,

@@ -60,10 +60,12 @@ class DevScapeGUI:
         except FileNotFoundError:
             messagebox.showerror(
                 "System Error",
-                "Error: Python executable not found. Make sure Python is in your PATH.",
+                "Error: Python executable not found. "
+                "Make sure Python is in your PATH.",
             )
             return (
-                "Error: Python executable not found. Make sure Python is in your PATH."
+                "Error: Python executable not found. "
+                "Make sure Python is in your PATH."
             )
 
     def get_current_state(self):
@@ -85,29 +87,39 @@ class DevScapeGUI:
                 if in_state_section and line.strip():
                     state_json_str += line + "\n"
 
-            # Clean up the JSON string (remove leading/trailing whitespace, etc.)
+            # Clean up the JSON string
             state_json_str = state_json_str.strip()
 
-            # The status output might include extra lines or formatting that makes direct json.loads fail.
-            # A more robust way would be to have the engine's status command output raw JSON for the state.
+            # The status output might include extra lines or formatting that makes
+            # direct json.loads fail.
+            # A more robust way would be to have the engine's status command
+            # output raw JSON for the state.
             # For now, we'll try to parse the pretty-printed JSON.
-            # This is a brittle approach and should be improved by having the CLI output machine-readable JSON.
+            # This is a brittle approach and should be improved by having the CLI
+            # output machine-readable JSON.
 
-            # Attempt to parse the JSON. This might fail if the pretty-printing adds non-JSON elements.
-            # A safer approach would be to have a dedicated CLI command to get raw state JSON.
-            # For this prototype, we'll assume the pretty-printed JSON is parsable after stripping.
+            # Attempt to parse the JSON. This might fail if the pretty-printing
+            # adds non-JSON elements.
+            # A safer approach would be to have a dedicated CLI command to get
+            # raw state JSON.
+            # For this prototype, we'll assume the pretty-printed JSON is
+            # parsable after stripping.
 
-            # Fallback to a simpler parsing if direct json.loads fails due to formatting
+            # Fallback to a simpler parsing if direct json.loads fails
             try:
-                # This is a hacky way to get the JSON part, ideally the CLI would have a raw JSON output option
-                # For now, we'll rely on the pretty-printed output being somewhat parsable
-                # This will likely need refinement if the status output format changes significantly
+                # This is a hacky way to get the JSON part, ideally the CLI
+                # would have a raw JSON output option
+                # For now, we'll rely on the pretty-printed output being
+                # somewhat parsable
+                # This will likely need refinement if the status output format
+                # changes significantly
                 state_data = json.loads(state_json_str)
                 return state_data
             except json.JSONDecodeError as e:
                 messagebox.showwarning(
                     "State Parsing Warning",
-                    f"Could not parse state JSON from status output. Error: {e}\nRaw string: {state_json_str}",
+                    f"Could not parse state JSON from status output. "
+                    f"Error: {e}\nRaw string: {state_json_str}",
                 )
                 return None
 

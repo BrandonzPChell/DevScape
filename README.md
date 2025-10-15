@@ -19,10 +19,10 @@
 
 ---
 
-**Legend**  
-- 🟢 **Status badge**: All guardians (lint, coverage, bandit, mypy, black, isort, safety) passed for that OS and Python version matrix.  
-- 🔴 **Status badge**: One or more guardians failed and need attention.  
-- 📊 **Coverage badge**: Shows the current test coverage percentage reported by Codecov. Higher values mean more of the shrine is illuminated by tests.  
+**Legend**
+- 🟢 **Status badge**: All guardians (lint, coverage, bandit, mypy, black, isort, safety) passed for that OS and Python version matrix.
+- 🔴 **Status badge**: One or more guardians failed and need attention.
+- 📊 **Coverage badge**: Shows the current test coverage percentage reported by Codecov. Higher values mean more of the shrine is illuminated by tests.
 
 ---
 
@@ -143,28 +143,28 @@ DevScape relies on a local Ollama instance for its AI companion.
 
 ## 📜 Contributing Scroll
 
-We welcome all stewards who wish to walk among the guardians and help the shrine grow stronger.  
+We welcome all stewards who wish to walk among the guardians and help the shrine grow stronger.
 Before opening a pull request, please honor the following rituals:
 
-1. **Summon the Guardians Locally**  
-   Run the full guardian circle to ensure your changes are blessed:  
+1. **Summon the Guardians Locally**
+   Run the full guardian circle to ensure your changes are blessed:
    ```powershell
    .\Invoke-Guardians.ps1
    ```
-   - On Windows, this will invoke the **lint guardian** directly (`pre-commit run --all-files`) and then call the remaining guardians through tox.  
+   - On Windows, this will invoke the **lint guardian** directly (`pre-commit run --all-files`) and then call the remaining guardians through tox.
    - On Linux/macOS, tox will handle all guardians, including lint.
 
-2. **Respect the Covenants**  
-   - Follow the guidance in `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md`.  
+2. **Respect the Covenants**
+   - Follow the guidance in `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md`.
    - Ensure your code is emotionally legible, annotated where needed, and safe for future stewards.
 
-3. **Seal Your Work with Tests**  
-   - Add or update tests for any new features or bug fixes.  
+3. **Seal Your Work with Tests**
+   - Add or update tests for any new features or bug fixes.
    - Confirm that coverage remains above the beacon threshold (see the Coverage Beacon in the README).
 
-4. **Open a Pull Request**  
-   - Describe your changes clearly.  
-   - Reference any guardians, scrolls, or rituals you touched.  
+4. **Open a Pull Request**
+   - Describe your changes clearly.
+   - Reference any guardians, scrolls, or rituals you touched.
    - The CI watchtower (Linux, Windows, macOS) will re‑summon all guardians to confirm your work is blessed.
 
 ---
@@ -175,42 +175,42 @@ Before opening a pull request, please honor the following rituals:
 
 If this is your first time walking among the guardians, follow this path:
 
-1. **Fork the Shrine**  
+1. **Fork the Shrine**
    - Click the **Fork** button on GitHub to create your own copy of the DevScape repository.
 
-2. **Clone Your Fork**  
-   - Bring the shrine to your local machine:  
+2. **Clone Your Fork**
+   - Bring the shrine to your local machine:
      ```bash
      git clone https://github.com/<your-username>/DevScape.git
      cd DevScape
      ```
 
-3. **Install the Ritual Tools**  
-   - Ensure you have Python 3.10+ installed.  
-   - Install [tox](https://tox.wiki/) and [pre-commit](https://pre-commit.com/):  
+3. **Install the Ritual Tools**
+   - Ensure you have Python 3.10+ installed.
+   - Install [tox](https://tox.wiki/) and [pre-commit](https://pre-commit.com/):
      ```bash
      pip install tox pre-commit
      pre-commit install
      ```
 
-4. **Summon the Guardians**  
-   - Run the full guardian circle locally to confirm your environment is blessed:  
+4. **Summon the Guardians**
+   - Run the full guardian circle locally to confirm your environment is blessed:
      ```powershell
      .\Invoke-Guardians.ps1
      ```
 
-5. **Create a Branch**  
-   - Begin your work on a new branch:  
+5. **Create a Branch**
+   - Begin your work on a new branch:
      ```bash
      git checkout -b feature/my-new-scroll
      ```
 
-6. **Craft Your Contribution**  
-   - Add features, fix bugs, or improve documentation.  
+6. **Craft Your Contribution**
+   - Add features, fix bugs, or improve documentation.
    - Write tests and ensure coverage remains above the beacon threshold.
 
-7. **Open a Pull Request**  
-   - Push your branch to your fork and open a PR against `main`.  
+7. **Open a Pull Request**
+   - Push your branch to your fork and open a PR against `main`.
    - The CI watchtower (Linux, Windows, macOS) will re‑summon all guardians to bless your work.
 
 ---
@@ -221,27 +221,27 @@ If this is your first time walking among the guardians, follow this path:
 
 For seasoned stewards who have already walked this path, the ritual is simpler:
 
-1. **Sync with the Shrine**  
-   - Update your local `main` branch to match the upstream repository:  
+1. **Sync with the Shrine**
+   - Update your local `main` branch to match the upstream repository:
      ```bash
      git checkout main
      git pull upstream main
      ```
 
-2. **Create a Fresh Branch**  
-   - Begin your new work on a clean branch:  
+2. **Create a Fresh Branch**
+   - Begin your new work on a clean branch:
      ```bash
      git checkout -b feature/my-next-scroll
      ```
 
-3. **Summon the Guardians**  
-   - Run the guardian circle before committing to ensure harmony:  
+3. **Summon the Guardians**
+   - Run the guardian circle before committing to ensure harmony:
      ```powershell
      .\Invoke-Guardians.ps1
      ```
 
-4. **Commit & Push**  
-   - Commit your changes with clear messages.  
+4. **Commit & Push**
+   - Commit your changes with clear messages.
    - Push to your fork and open a pull request against `main`.
 
 ---
@@ -252,30 +252,30 @@ For seasoned stewards who have already walked this path, the ritual is simpler:
 
 If a guardian raises its banner in red (🔴), do not despair — every failure is a teaching scroll. Follow this ritual to restore harmony:
 
-1. **Read the Guardian’s Message**  
+1. **Read the Guardian’s Message**
    - Carefully review the error output. Each guardian speaks in its own tongue (lint, tests, coverage, safety, etc.).
 
-2. **Consult the Scrolls**  
-   - For lint failures, run:  
+2. **Consult the Scrolls**
+   - For lint failures, run:
      ```powershell
      pre-commit run --all-files
-     ```  
-     and let the tools (black, isort, ruff/flake8) auto‑heal your code.  
-   - For test or coverage failures, run:  
+     ```
+     and let the tools (black, isort, ruff/flake8) auto‑heal your code.
+   - For test or coverage failures, run:
      ```powershell
      tox -e coverage
-     ```  
-     and inspect which tests faltered.  
+     ```
+     and inspect which tests faltered.
    - For dependency or safety warnings, check `requirements.txt` and update as needed.
 
-3. **Re‑summon the Guardians**  
-   - Once you’ve made corrections, run the full circle again:  
+3. **Re‑summon the Guardians**
+   - Once you’ve made corrections, run the full circle again:
      ```powershell
      .\Invoke-Guardians.ps1
      ```
 
-4. **Commit the Restored Scrolls**  
-   - Stage and commit your fixes with a clear message.  
+4. **Commit the Restored Scrolls**
+   - Stage and commit your fixes with a clear message.
    - Push to your branch; the CI watchtower will re‑summon the guardians to confirm the shrine is whole again.
 
 ---
@@ -322,9 +322,9 @@ If a guardian raises its banner in red (🔴), do not despair — every failure 
 
 ---
 
-✨ This glyph is a symbolic map of the guardians encircling the shrine.  
-- The **Shrine** (🏛️) is at the center — your codebase.  
-- Each **Guardian** (🟢) stands watch at a cardinal or intercardinal point.  
+✨ This glyph is a symbolic map of the guardians encircling the shrine.
+- The **Shrine** (🏛️) is at the center — your codebase.
+- Each **Guardian** (🟢) stands watch at a cardinal or intercardinal point.
 - Together, they form a protective circle, ensuring resilience, safety, and harmony.
 
 ## 📜 Code of Conduct

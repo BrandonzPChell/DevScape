@@ -88,7 +88,10 @@ class LineageBadge:
 
     def to_markdown(self) -> str:
         """Returns the markdown representation of the badge."""
-        return f"![Lineage](https://img.shields.io/badge/lineage-{self.depth}_entries-{self.color})"
+        return (
+            f"![Lineage](https://img.shields.io/badge/lineage-"
+            f"{self.depth}_entries-{self.color})"
+        )
 
     def to_json_str(self) -> str:
         """Returns the JSON string representation of the badge."""

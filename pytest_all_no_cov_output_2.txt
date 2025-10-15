@@ -30,4 +30,4 @@ tests\test_ollama_ai_parser.py ........                                  [ 81%]
 tests\test_ollama_ai_parsing.py ....                                     [ 83%]
 tests\test_ollama_ai_requests.py ...                                     [ 85%]
 tests\test_ollama_ai_unit.py ..                                          [ 87%]
-tests\test_rendering.py 
+tests\test_rendering.py

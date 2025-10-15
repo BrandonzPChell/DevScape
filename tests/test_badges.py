@@ -1,5 +1,6 @@
+import json
+
 import pytest
-from conftest import to_json_str
 
 from devscape.badges import CovenantBadge, CoverageBadge, LineageBadge
 
@@ -33,7 +34,7 @@ class TestCovenantBadge:
             "color": "brightgreen",
             "markdown": "![Covenants](covenants-passing-brightgreen)",
         }
-        assert badge.to_json_str() == to_json_str(expected_json)
+        assert badge.to_json_str() == json.dumps(expected_json, indent=2)
 
 
 class TestCoverageBadge:
@@ -68,7 +69,7 @@ class TestCoverageBadge:
             "color": "brightgreen",
             "markdown": "![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen)",
         }
-        assert badge.to_json_str() == to_json_str(expected_json)
+        assert badge.to_json_str() == json.dumps(expected_json, indent=2)
 
 
 class TestLineageBadge:
@@ -95,4 +96,4 @@ class TestLineageBadge:
             "color": "blue",
             "markdown": "![Lineage](https://img.shields.io/badge/lineage-10_entries-blue)",
         }
-        assert badge.to_json_str() == to_json_str(expected_json)
+        assert badge.to_json_str() == json.dumps(expected_json, indent=2)

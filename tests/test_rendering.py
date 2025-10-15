@@ -1,7 +1,4 @@
 import os
-
-os.environ["SDL_VIDEODRIVER"] = "dummy"
-
 import unittest
 from unittest.mock import ANY, Mock, patch
 
@@ -15,6 +12,8 @@ from devscape.rendering import (
     render_pixel_art,
 )
 from devscape.state import LLMCharacter
+
+os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 
 class TestRenderPixelArt(unittest.TestCase):

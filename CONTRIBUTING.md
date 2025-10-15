@@ -1,6 +1,6 @@
 # Contributing to DevScape
 
-Welcome, steward ✦  
+Welcome, steward ✦
 This archive is more than code — it is a living shrine. Every contribution is a ritual act that strengthens its harmony and resilience. Please follow these guidelines to ensure your offerings align with the guardians and lore.
 
 ---

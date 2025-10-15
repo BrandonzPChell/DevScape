@@ -496,6 +496,7 @@ def test_handle_entity_defeat_awards_xp_and_gold(state_manager_with_mock_game_st
     )
 
     manager.player_manager._handle_entity_defeat(player, defeated_enemy)
+    assert player.xp == initial_xp + defeated_enemy.xp + BASE_REWARD
     assert player.inventory.gold == initial_gold + BASE_REWARD
     assert (
         f"You gained {defeated_enemy.xp + BASE_REWARD} XP and {BASE_REWARD} gold."

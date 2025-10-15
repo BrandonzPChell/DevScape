@@ -6,9 +6,9 @@ from types import SimpleNamespace
 import pytest
 
 from devscape import ollama_ai as ollama_ai_mod
+from devscape.main import Game
 
 
-# Mock pygame and its dependencies for Game instantiation
 @pytest.fixture(autouse=True)
 def mock_game_dependencies(monkeypatch):
     mock_pygame = SimpleNamespace()
@@ -49,14 +49,11 @@ def mock_game_dependencies(monkeypatch):
     )
     monkeypatch.setattr(mod, "draw_chat_bubble", lambda *a, **k: None)
     monkeypatch.setattr(mod, "render_dashboard_content", lambda *a, **k: None)
+
     monkeypatch.setattr(mod, "render_pixel_art", lambda *a, **k: None)
 
 
-from devscape.main import Game
-
-
 def test_export_constellation_empty_logs():
-    # from devscape.main import Game # Removed
 
     game = Game()
     game.llm_character_id = "llm_1"
@@ -74,8 +71,6 @@ def test_export_constellation_empty_logs():
 
 
 def test_export_constellation_with_events():
-    # from devscape.main import Game # Removed
-
     game = Game()
     game.event_log = [
         {"timestamp": 1, "event": "storm", "mood": "anxious", "traits": {"courage": 4}},

@@ -150,7 +150,7 @@ def test_start_quest_success(mock_devscape_gui_instance):
     mock_askstring.side_effect = ["quest1", "user1"]
     with patch.object(
         gui, "run_cli_command", return_value="Quest Started"
-    ) as mock_run_cli_command:
+    ) as mock_run_cli_command:  # noqa: F841
         with patch.object(gui, "refresh_status") as mock_refresh_status:
             gui.start_quest()
             mock_run_cli_command.assert_called_once_with(
@@ -251,7 +251,7 @@ def test_evolve_trait_dialog_on_ok_logic_success(mock_devscape_gui_instance, moc
 
         with patch.object(
             gui, "run_cli_command", return_value="Trait Evolved"
-        ) as mock_run_cli_command:
+        ) as mock_run_cli_command:  # noqa: F841
             with patch.object(gui, "refresh_status") as mock_refresh_status:
                 gui.evolve_trait_dialog()
                 # Find the call to Button that creates the 'OK' button
@@ -287,6 +287,7 @@ def test_evolve_trait_dialog_on_ok_logic_invalid_level(
 
         mock_string_var_instance = MagicMock()
         mock_string_var_instance.get.return_value = "trait1"
+        mock_stringvar_class.return_value = mock_string_var_instance
         mock_level_entry_instance = MagicMock()
         mock_level_entry_instance.get.return_value = "0"  # Invalid level
         mock_contributor_entry_instance = MagicMock()
@@ -301,7 +302,7 @@ def test_evolve_trait_dialog_on_ok_logic_invalid_level(
         mock_button_class.return_value = mock_button_instance
         with patch.object(
             gui, "run_cli_command", return_value=""
-        ) as mock_run_cli_command:
+        ) as mock_run_cli_command:  # noqa: F841
             gui.evolve_trait_dialog()
             # Find the call to Button that creates the 'OK' button
             ok_button_call = None
@@ -350,7 +351,7 @@ def test_evolve_trait_dialog_on_ok_logic_non_integer_level(
         mock_button_class.return_value = mock_button_instance
         with patch.object(
             gui, "run_cli_command", return_value=""
-        ) as mock_run_cli_command:
+        ) as mock_run_cli_command:  # noqa: F841
             gui.evolve_trait_dialog()
             # Find the call to Button that creates the 'OK' button
             ok_button_call = None

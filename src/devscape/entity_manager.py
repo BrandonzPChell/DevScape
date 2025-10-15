@@ -96,6 +96,12 @@ def place_initial_entities(
             xp=0,
             level=1,
             dialogue=NPC_DIALOGUE[npc_name],
+
+
+
+
+
+
             entity_type=ENTITY_TYPES["NPC"],
             color=ENTITY_COLORS["NPC"],
             sight_range=PLAYER_SIGHT_RANGE,
@@ -182,7 +188,8 @@ def get_entity_color(
         entity_id (str): The ID of the entity.
 
     Returns:
-        Optional[Tuple[int, int, int]]: The RGB color tuple, or None if entity not found.
+        Optional[Tuple[int, int, int]]: The RGB color tuple,
+        or None if entity not found.
     """
     entity = get_entity_by_id(game_state, entity_id)
     return entity.color[:3] if entity and entity.color else None
@@ -212,7 +219,8 @@ def get_entity_position(
         entity_id (str): The ID of the entity.
 
     Returns:
-        Optional[Tuple[int, int]]: The (x, y) coordinates of the entity, or None if entity not found.
+        Optional[Tuple[int, int]]: The (x, y) coordinates of the entity,
+        or None if entity not found.
     """
     entity = get_entity_by_id(game_state, entity_id)
     return entity.position if entity else None
@@ -226,7 +234,8 @@ def get_entity_health(game_state: GameState, entity_id: str) -> Optional[int]:
         entity_id (str): The ID of the entity.
 
     Returns:
-        Optional[int]: The health of the entity, or None if entity not found or has no health attribute.
+        Optional[int]: The health of the entity, or None if entity not found
+        or has no health attribute.
     """
     entity = get_entity_by_id(game_state, entity_id)
     return getattr(entity, "health", None)
@@ -240,7 +249,8 @@ def get_entity_max_health(game_state: GameState, entity_id: str) -> Optional[int
         entity_id (str): The ID of the entity.
 
     Returns:
-        Optional[int]: The maximum health of the entity, or None if entity not found or has no max_health attribute.
+        Optional[int]: The maximum health of the entity, or None if entity not found
+        or has no max_health attribute.
     """
     entity = get_entity_by_id(game_state, entity_id)
     return getattr(entity, "max_health", None)
@@ -254,7 +264,8 @@ def get_entity_xp(game_state: GameState, entity_id: str) -> Optional[int]:
         entity_id (str): The ID of the entity.
 
     Returns:
-        Optional[int]: The XP of the entity, or None if entity not found or has no xp attribute.
+        Optional[int]: The XP of the entity, or None if entity not found
+        or has no xp attribute.
     """
     entity = get_entity_by_id(game_state, entity_id)
     return getattr(entity, "xp", None)
@@ -268,7 +279,8 @@ def get_entity_level(game_state: GameState, entity_id: str) -> Optional[int]:
         entity_id (str): The ID of the entity.
 
     Returns:
-        Optional[int]: The level of the entity, or None if entity not found or has no level attribute.
+        Optional[int]: The level of the entity, or None if entity not found
+        or has no level attribute.
     """
     entity = get_entity_by_id(game_state, entity_id)
     return getattr(entity, "level", None)
@@ -282,7 +294,8 @@ def get_entity_dialogue(game_state: GameState, entity_id: str) -> Optional[str]:
         entity_id (str): The ID of the entity.
 
     Returns:
-        Optional[str]: The dialogue string, or None if not an LLMCharacter or no dialogue.
+        Optional[str]: The dialogue string, or None if not an LLMCharacter
+        or no dialogue.
     """
     entity = get_entity_by_id(game_state, entity_id)
     if isinstance(entity, LLMCharacter):
@@ -298,7 +311,8 @@ def get_entity_type(game_state: GameState, entity_id: str) -> Optional[str]:
         entity_id (str): The ID of the entity.
 
     Returns:
-        Optional[str]: The type of the entity (e.g., "ENEMY", "NPC"), or None if entity not found.
+        Optional[str]: The type of the entity (e.g., "ENEMY", "NPC"), or None
+        if entity not found.
     """
     entity = get_entity_by_id(game_state, entity_id)
     return entity.entity_type if entity else None

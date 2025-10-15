@@ -44,6 +44,7 @@ def test_send_request_success_json_content(monkeypatch):
     client = ollama_ai.OllamaClient(api_url="http://fake-url", model="fake-model")
     messages = [{"role": "user", "content": "a prompt"}]
     out = client._send_request(messages)  # pylint: disable=protected-access
+    assert out == {"move": None, "dialogue": "hello from AI", "raw": "hello from AI"}
 
 
 def test_send_request_success_text_content(monkeypatch):

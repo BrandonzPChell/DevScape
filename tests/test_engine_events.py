@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from unittest.mock import MagicMock
 
 import jsonschema
 import pytest
@@ -141,3 +142,19 @@ def test_event_bus_records_lineage_for_item_acquired():
         "event_type": "item_acquired",
         "payload": event_payload,
     }
+
+def test_event_bus_subscribe_and_publish_basic():
+    event_bus = engine.EventBus()
+    mock_listener = MagicMock()
+
+    event_bus.subscribe("test_event", mock_listener)
+    payload = {"data": "test_data"}
+    event_bus.publish("test_event", payload)
+
+    mock_listener.assert_called_once_with("test_event", payload)
+
+    # Ensure listener not subscribed to another event is not called
+    another_listener = MagicMock()
+    event_bus.subscribe("another_event", another_listener)
+    event_bus.publish("unrelated_event", {"data": "unrelated"})
+    another_listener.assert_not_called()

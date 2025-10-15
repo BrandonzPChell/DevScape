@@ -136,4 +136,4 @@ tests/test_ollama_ai_requests.py::test_send_request_malformed_json_returns_text 
 tests/test_ollama_ai_requests.py::test_send_request_http_error_uses_fallback PASSED [ 85%]
 tests/test_ollama_ai_unit.py::test_send_request_returns_payload_on_success PASSED [ 86%]
 tests/test_ollama_ai_unit.py::test_send_request_raises_on_client_error PASSED [ 87%]
-tests/test_rendering.py::TestDrawChatBubble::test_draw_chat_bubble_basic 
+tests/test_rendering.py::TestDrawChatBubble::test_draw_chat_bubble_basic
