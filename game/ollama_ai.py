@@ -52,20 +52,33 @@ class OllamaClient:
 
     def _parse_response(self, response_text):
         """Parses the LLM's response to extract the move and dialogue."""
-        import re
-
-        move_match = re.search(r"MOVE:\s*(\w+)", response_text, re.IGNORECASE)
-        say_match = re.search(r"SAY:\s*(.*)", response_text, re.IGNORECASE)
-
         move = "stay"
-        if move_match:
-            parsed_move = move_match.group(1).lower()
+        dialogue = "..."
+
+        # Normalize case for parsing keywords
+        response_upper = response_text.upper()
+
+        # Find positions of keywords
+        move_pos = response_upper.find("MOVE:")
+        say_pos = response_upper.find("SAY:")
+
+        # Isolate the move part
+        if move_pos != -1:
+            # Find the end of the move part (either start of say or end of string)
+            end_pos = say_pos if (say_pos > move_pos) else len(response_text)
+            move_part = response_text[move_pos + 5:end_pos].strip(" |")
+            parsed_move = move_part.strip().lower()
             if parsed_move in ["up", "down", "left", "right", "stay"]:
                 move = parsed_move
 
-        dialogue = "..."
-        if say_match:
-            dialogue = say_match.group(1).strip()
+        # Isolate the say part
+        if say_pos != -1:
+            # Find the end of the say part (either start of move or end of string)
+            end_pos = move_pos if (move_pos > say_pos) else len(response_text)
+            dialogue_part = response_text[say_pos + 4:end_pos].strip(" |")
+            dialogue = dialogue_part.strip()
+            if not dialogue: # handle empty SAY:
+                dialogue = "..."
 
         return move, dialogue
 
