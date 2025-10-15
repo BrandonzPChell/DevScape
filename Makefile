@@ -27,8 +27,7 @@ guardians: format lint test coverage
 
 # Auto-format with black and isort
 format:
-	black .
-	isort .
+	tox -e lint
 
 # Lint with pylint
 lint:
