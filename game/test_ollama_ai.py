@@ -41,3 +41,9 @@ def test_parse_response_flexible(client):
     move, dialogue = client._parse_response(response_text_5)
     assert move == "stay"
     assert dialogue == "..."
+
+    # Test case 6: Reversed order
+    response_text_6 = "SAY: I'm heading down! | MOVE: down"
+    move, dialogue = client._parse_response(response_text_6)
+    assert move == "down"
+    assert dialogue == "I'm heading down!"
