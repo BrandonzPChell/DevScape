@@ -4,7 +4,7 @@ Tests for the DevScape game, focusing on rendering functions.
 
 import pygame
 import pytest
-from main import COLOR_MAP, TILE_SIZE, TRANSPARENT, render_pixel_art
+from main import COLOR_MAP, TILE_SIZE, TRANSPARENT, draw_text, render_pixel_art
 
 
 @pytest.fixture(scope="module")
@@ -78,3 +78,27 @@ def test_render_pixel_art_offset(pygame_init):
     # Check a pixel outside the rendered area to ensure it's transparent
     actual_color_outside = surface.get_at((0, 0))
     assert actual_color_outside[3] == 0
+
+
+def test_draw_text_avoids_screen_edge(pygame_init):
+    """Tests that draw_text moves text to prevent it from rendering off-screen."""
+    surface_width = 200
+    surface_height = 100
+    surface = pygame.Surface((surface_width, surface_height))
+    surface.fill((0, 0, 0))  # Black background
+    font = pygame.font.Font(pygame.font.get_default_font(), 18)
+    text_surface = font.render("Hello", True, (255, 255, 255))
+    text_rect = text_surface.get_rect()
+
+    # A rect positioned at the top edge of the screen
+    top_edge_rect = pygame.Rect(100, 5, 50, 10)
+    text = "Hello"
+
+    draw_text(surface, text, 18, top_edge_rect, color=(255, 255, 255))
+
+    # The text should be rendered *below* the rect
+    expected_y = top_edge_rect.bottom + 10 + text_rect.height / 2
+    pixel_color = surface.get_at((top_edge_rect.centerx, int(expected_y)))
+
+    # The pixel should now be the text color, not the background color
+    assert pixel_color[:3] != (0, 0, 0)

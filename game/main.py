@@ -129,7 +129,14 @@ def draw_text(surface, text, size, rect, color=WHITE):
     font = pygame.font.Font(pygame.font.get_default_font(), size)
     text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect()
+
+    # Position the text above the entity by default
     text_rect.center = (rect.centerx, rect.top - 10)
+
+    # If the text would be rendered off-screen, move it below the entity
+    if text_rect.top < 0:
+        text_rect.center = (rect.centerx, rect.bottom + 20)
+
     surface.blit(text_surface, text_rect)
 
 
